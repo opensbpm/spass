@@ -24,6 +24,13 @@
     		<rdf:type rdf:resource="&standard-pass-ont;PASSProcessModel" ></rdf:type>
     		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >AProcessModel</standard-pass-ont:hasModelComponentID>
     		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A Model</standard-pass-ont:hasModelComponentLabel>
+    		<standard-pass-ont:contains rdf:resource="http://opensbpm.org/pass/minimal#ASubjectBehavior" ></standard-pass-ont:contains>
     </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#ASubjectBehavior" >
+		<rdf:type rdf:resource="&standard-pass-ont;SubjectBehavior" ></rdf:type>
+		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ASubjectBehavior</standard-pass-ont:hasModelComponentID>
+		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A SubjectBehavior</standard-pass-ont:hasModelComponentLabel>
+	</owl:NamedIndividual>
 
 </rdf:RDF>

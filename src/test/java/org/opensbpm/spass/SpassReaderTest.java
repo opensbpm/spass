@@ -1,12 +1,18 @@
 package org.opensbpm.spass;
 
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
-import org.opensbpm.spass.model.ProcessModel;
+import org.opensbpm.spass.model.PASSProcessModel;
+import org.opensbpm.spass.model.PASSProcessModelElement;
+import org.opensbpm.spass.model.SubjectBehavior;
 
 import java.io.InputStream;
+import java.util.Collection;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.opensbpm.spass.matchers.ModelMatchers.*;
 
 public class SpassReaderTest {
 
@@ -17,11 +23,17 @@ public class SpassReaderTest {
         assert inputStream != null;
 
         //act
-        ProcessModel processModel = new SPassReader().read(inputStream);
+        PASSProcessModel processModel = new SPassReader().read(inputStream);
 
         //assert
-        assertThat(processModel, hasProperty("id", is("AProcessModel")));
-        assertThat(processModel, hasProperty("label", is("A Model")));
+        assertThat(processModel, hasId("AProcessModel"));
+        assertThat(processModel, hasLabel("A Model"));
+        assertThat(processModel, hasElementCount(1));
+
+        Collection<SubjectBehavior> subjectBehaviors = processModel.getContains(SubjectBehavior.class);
+        assertThat(subjectBehaviors, contains(
+                isSubjectBehavior("ASubjectBehavior", "A SubjectBehavior")
+        ));
     }
 
 }

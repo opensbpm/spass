@@ -1,6 +1,7 @@
 package org.opensbpm.spass;
 
-import org.opensbpm.spass.model.ProcessModel;
+import org.opensbpm.spass.model.PASSProcessModel;
+import org.opensbpm.spass.model.SubjectBehavior;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
@@ -8,14 +9,16 @@ import org.semanticweb.owlapi.model.*;
 
 import javax.annotation.Nullable;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 public class SPassReader {
     private final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+    private final PassOwlDataFactory passOwlDataFactory;
     private OWLOntology ontology;
 
     public SPassReader() {
@@ -23,9 +26,10 @@ public class SPassReader {
         manager.setIRIMappers(asSet(
                 createLocalIRIMapper("http://www.i2pm.net/standard-pass-ont", "/standard_PASS_ont_dev.owl")
         ));
+        passOwlDataFactory = new PassOwlDataFactory();
     }
 
-    public ProcessModel read(InputStream input) throws SPassIncompleteException, OWLOntologyCreationException {
+    public PASSProcessModel read(InputStream input) throws SPassIncompleteException, OWLOntologyCreationException {
         OWLOntologyDocumentSource source = new StreamDocumentSource(input);
         OWLOntologyLoaderConfiguration config = new OWLOntologyLoaderConfiguration();
         ontology = manager.loadOntologyFromOntologyDocument(source, config);
@@ -33,36 +37,81 @@ public class SPassReader {
         //dumpSuperclasses(ontology);
         dumpIndividuals();
 
-        OWLDataFactory dataFactory = manager.getOWLDataFactory();
-        OWLClass passProcessModelClass = dataFactory.getOWLClass(IRI.create("http://www.i2pm.net/standard-pass-ont#PASSProcessModel"));
-
-        OWLNamedIndividual passModelIndividual = ontology.getIndividualsInSignature().stream()
-                .filter(individual -> ontology.getClassAssertionAxioms(individual).stream()
-                        .map(axiom -> axiom.getClassExpression())
-                        .filter(typeExpr -> !typeExpr.isAnonymous())
-                        .map(typeExpr -> typeExpr.asOWLClass())
-                        .filter(cls -> passProcessModelClass.getIRI().equals(cls.getIRI()))
-                        .count() > 0
-                )
+        OWLNamedIndividual passModelIndividual = findNamedIndividualByClass(passOwlDataFactory.getPassProcessModelClass())
                 .findFirst()
                 .orElseThrow(() -> new SPassIncompleteException("No PASSProcessModel found in ontology"));
         String id = readDataProperty(passModelIndividual, "hasModelComponentID");
         String label = readDataProperty(passModelIndividual, "hasModelComponentLabel");
 
-        ProcessModel processModel = new ProcessModel() {
-            @Override
-            public String getId() {
-                return id;
-            }
+        List<SubjectBehavior> subjectBehaviors = findNamedIndividualsByObjectProperty(passModelIndividual, passOwlDataFactory.getContainsProperty())
+                .filter(individual -> hasClass(individual, passOwlDataFactory.getSubjectBehaviorClass()))
+                .map(this::toSubjectBehavior)
+                .toList();
 
-            @Override
-            public String getLabel() {
-                return label;
-            }
-        };
+        return PASSProcessModel.builder()
+                .withId(id)
+                .withLabel(label)
+                .addContains(subjectBehaviors)
+                .build();
+    }
 
+    private SubjectBehavior toSubjectBehavior(OWLNamedIndividual individual) {
+        String id = readDataProperty(individual, "hasModelComponentID");
+        String label = readDataProperty(individual, "hasModelComponentLabel");
 
-        return processModel;
+        return SubjectBehavior.builder()
+                .withId(id)
+                .withLabel(label)
+                .build();
+    }
+
+    private Stream<OWLNamedIndividual> findNamedIndividualByClass(OWLClass owlClass) {
+        return ontology.getIndividualsInSignature().stream()
+                .filter(individual -> hasClass(individual, owlClass));
+    }
+
+    private boolean hasClass(OWLNamedIndividual individual, OWLClass owlClass) {
+        return ontology.getClassAssertionAxioms(individual).stream()
+                .map(OWLClassAssertionAxiom::getClassExpression)
+                .filter(typeExpr -> !typeExpr.isAnonymous())
+                .map(AsOWLClass::asOWLClass)
+                .filter(cls -> owlClass.getIRI().equals(cls.getIRI()))
+                .count() > 0;
+    }
+
+    public Stream<OWLNamedIndividual> findNamedIndividualsByObjectProperty(OWLNamedIndividual individual, OWLObjectProperty owlObjectProperty) {
+        return ontology.getObjectPropertyAssertionAxioms(individual).stream()
+                .filter(ax -> ax.getProperty().isOWLObjectProperty() &&
+                        ax.getObject().isNamed() &&
+                        ax.getProperty().asOWLObjectProperty().getIRI().equals(owlObjectProperty.getIRI()))
+                .map(ax -> ax.getObject().asOWLNamedIndividual());
+    }
+
+    class PassOwlDataFactory {
+        private final static String BASE_IRI = "http://www.i2pm.net/standard-pass-ont";
+
+        private OWLClass getPassProcessModelClass() {
+            return getOwlClass("PASSProcessModel");
+        }
+
+        /**
+         * Generic ObjectProperty that links two model elements where one contains another (possible multiple).
+         */
+        private OWLObjectProperty getContainsProperty() {
+            return getOwlObjectProperty("contains");
+        }
+
+        private OWLClass getSubjectBehaviorClass() {
+            return getOwlClass("SubjectBehavior");
+        }
+
+        private OWLClass getOwlClass(String shortName) {
+            return manager.getOWLDataFactory().getOWLClass(IRI.create(format("%s#%s", BASE_IRI, shortName)));
+        }
+
+        private OWLObjectProperty getOwlObjectProperty(String shortName) {
+            return manager.getOWLDataFactory().getOWLObjectProperty(IRI.create(format("%s#%s", BASE_IRI, shortName)));
+        }
     }
 
     private void dumpIndividuals() {
