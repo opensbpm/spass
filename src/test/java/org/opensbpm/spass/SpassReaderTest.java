@@ -21,7 +21,7 @@ public class SpassReaderTest {
         assert inputStream != null;
 
         //act
-        PASSProcessModel processModel = new SPassReader().read(inputStream);
+        PASSProcessModel processModel = SPassReader.loadOwl(inputStream);
 
         //assert
         assertThat(processModel, hasId("AProcessModel"));
