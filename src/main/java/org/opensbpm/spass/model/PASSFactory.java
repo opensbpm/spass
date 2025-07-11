@@ -8,9 +8,14 @@ public interface PASSFactory {
         return DefaultPASSFactory.getInstance();
     }
 
-    PASSProcessModel.Builder createPassProcessModel();
+    PASSProcessModel.Builder createPassProcessModelBuilder();
+    PASSProcessModel.Mutable createPASSProcessModel();
 
-    SubjectBehavior.Builder createSubjectBehavior();
+    SubjectBehavior.Builder createSubjectBehaviorBuilder();
 
-    DoState.Builder createDoState();
+    SubjectBehavior.Mutable createSubjectBehavior();
+
+    DoState.Builder createDoStateBuilder();
+
+    DoState.Mutable createDoState();
 }

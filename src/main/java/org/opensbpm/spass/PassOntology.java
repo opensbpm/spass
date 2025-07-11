@@ -1,6 +1,5 @@
 package org.opensbpm.spass;
 
-import org.opensbpm.spass.model.PASSProcessModel;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
@@ -9,7 +8,9 @@ import org.semanticweb.owlapi.model.*;
 import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,11 +18,16 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 public class PassOntology {
+    private final static String BASE_IRI = "http://www.i2pm.net/standard-pass-ont";
 
     public static PassOntology loadOwl(InputStream input) throws OWLOntologyCreationException {
         PassOntology passOntology = new PassOntology();
         passOntology.loadOntology(input);
         return passOntology;
+    }
+
+    public static IRI createIRI(String shortName) {
+        return IRI.create(format("%s#%s", BASE_IRI, shortName));
     }
 
     private final OWLOntologyManager manager;
@@ -44,9 +50,34 @@ public class PassOntology {
         ontology = manager.loadOntologyFromOntologyDocument(source, config);
 
     }
-
     public PassOwlDataFactory getPassOwlDataFactory() {
         return passOwlDataFactory;
+    }
+
+    public Stream<OWLNamedIndividual> getIndividuals() {
+        return ontology.individualsInSignature();
+    }
+
+    public Stream<OWLDataPropertyAssertionAxiom> getDataPropertyAssertions() {
+        return ontology.axioms(AxiomType.DATA_PROPERTY_ASSERTION);
+    }
+
+    public OWLClass getTypeOfIndividual(OWLNamedIndividual namedIndividual) {
+        return getClassesOfIndividual(namedIndividual)
+                .reduce(onlyOne())
+                .orElseThrow(() -> new RuntimeException("Now OWLClass found for individual: " + namedIndividual.getIRI()));
+    }
+
+    private static BinaryOperator<OWLClass> onlyOne() {
+        return (a, b) -> {
+            throw new IllegalStateException("Stream contains more than one element");
+        };
+    }
+
+    public Stream<OWLClass> getClassesOfIndividual(OWLNamedIndividual namedIndividual) {
+        return ontology.classAssertionAxioms(namedIndividual)
+                .map(OWLClassAssertionAxiom::getClassExpression)
+                .map(OWLClassExpression::asOWLClass);
     }
 
     public Stream<OWLNamedIndividual> retrieveContainsOfClass(OWLNamedIndividual namedIndividual, OWLClass owlClass) {
@@ -78,6 +109,16 @@ public class PassOntology {
                         ax.getObject().isNamed() &&
                         ax.getProperty().asOWLObjectProperty().getIRI().equals(owlObjectProperty.getIRI()))
                 .map(ax -> ax.getObject().asOWLNamedIndividual());
+    }
+
+    public String readDataProperty(OWLNamedIndividual individual, String propertyShortName) {
+        for (OWLDataPropertyAssertionAxiom ax : ontology.getDataPropertyAssertionAxioms(individual)) {
+            OWLDataProperty property = ax.getProperty().asOWLDataProperty();
+            if (property.getIRI().getShortForm().equals(propertyShortName)) {
+                return ax.getObject().getLiteral();
+            }
+        }
+        return null; // Not found
     }
 
     public void dumpIndividuals() {
@@ -124,14 +165,16 @@ public class PassOntology {
         }
     }
 
-    public String readDataProperty(OWLNamedIndividual individual, String propertyShortName) {
-        for (OWLDataPropertyAssertionAxiom ax : ontology.getDataPropertyAssertionAxioms(individual)) {
-            OWLDataProperty property = ax.getProperty().asOWLDataProperty();
-            if (property.getIRI().getShortForm().equals(propertyShortName)) {
-                return ax.getObject().getLiteral();
-            }
+    public void listObjectPropertiesWithDomainAndRange() {
+        Set<OWLObjectPropertyAssertionAxiom> axioms = ontology.getAxioms(AxiomType.OBJECT_PROPERTY_ASSERTION);
+
+        for (OWLObjectPropertyAssertionAxiom ax : axioms) {
+            OWLIndividual subject = ax.getSubject();
+            OWLObjectPropertyExpression property = ax.getProperty();
+            OWLIndividual object = ax.getObject();
+
+            System.out.println(subject + " " + property + " " + object);
         }
-        return null; // Not found
     }
 
     public void dumpSuperclasses() {
@@ -181,10 +224,13 @@ public class PassOntology {
 
 
     public final class PassOwlDataFactory {
-        private final static String BASE_IRI = "http://www.i2pm.net/standard-pass-ont";
+
+        public IRI getPassProcessModelIRI() {
+            return createIRI("PASSProcessModel");
+        }
 
         public OWLClass getPassProcessModelClass() {
-            return getOwlClass("PASSProcessModel");
+            return getOwlClass(getPassProcessModelIRI());
         }
 
         /**
@@ -207,16 +253,17 @@ public class PassOntology {
         }
 
         private OWLClass getOwlClass(String shortName) {
-            return manager.getOWLDataFactory().getOWLClass(createIRI(shortName));
+            return getOwlClass(createIRI(shortName));
+        }
+
+        private OWLClass getOwlClass(IRI iri) {
+            return manager.getOWLDataFactory().getOWLClass(iri);
         }
 
         private OWLObjectProperty getOwlObjectProperty(String shortName) {
             return manager.getOWLDataFactory().getOWLObjectProperty(createIRI(shortName));
         }
 
-        private IRI createIRI(String shortName) {
-            return IRI.create(format("%s#%s", BASE_IRI, shortName));
-        }
 
     }
 }

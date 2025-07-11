@@ -1,4 +1,6 @@
-package org.opensbpm.spass.model;
+package org.opensbpm.spass.model.impls;
+
+import org.opensbpm.spass.model.DoState;
 
 /**
  * Additional to the subject interaction a PASS Model consist of multiple descriptions of subject&apos;s behaviors. These are graphs described with the means of $BehaviorDescribingComponents$
@@ -7,12 +9,7 @@ package org.opensbpm.spass.model;
  *
  * @see http://www.i2pm.net/standard-pass-ont#SubjectBehavior
  */
-public interface SubjectBehavior extends PASSProcessModelElement {
+class MutableDoState extends MutablePASSProcessModelElement implements DoState, DoState.Mutable {
 
-    interface Mutable extends SubjectBehavior, PASSProcessModelElement.Mutable {
 
-    }
-
-    interface Builder extends PASSProcessModelElement.Builder<SubjectBehavior, Builder> {
-    }
 }

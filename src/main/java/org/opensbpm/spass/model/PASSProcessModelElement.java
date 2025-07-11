@@ -29,6 +29,36 @@ public interface PASSProcessModelElement {
 
     <T extends PASSProcessModelElement> Collection<T> getContains(Class<T> passClass);
 
+    interface Mutable extends PASSProcessModelElement{
+        /**
+         * Sets the id of the process model.
+         *
+         * @param id the id to set
+         */
+        void setId(String id);
+
+        /**
+         * Sets the label of the process model.
+         *
+         * @param label the label to set
+         */
+        void setLabel(String label);
+
+        /**
+         * Adds a new element to the contains property.
+         *
+         * @param modelElement the model element to add
+         */
+        void addContains(PASSProcessModelElement modelElement);
+
+        /**
+         * Adds a collection of elements to the contains property.
+         *
+         * @param modelElements the collection of model elements to add
+         */
+        void addContains(Collection<? extends PASSProcessModelElement> modelElements);
+    }
+
     interface Builder<T, B extends Builder<T, B>> {
         B withId(String id);
 

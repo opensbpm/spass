@@ -17,7 +17,7 @@
     xmlns:standard-pass-ont="http://www.i2pm.net/standard-pass-ont#"
     >
 	<owl:Ontology rdf:about="http://opensbpm.org/pass/minimal">
-		<owl:versionIRI rdf:resource="http://opensbpm.org/pass/minimal1"></owl:versionIRI>
+		<owl:versionIRI rdf:resource="http://opensbpm.org/pass/minimal/1"></owl:versionIRI>
 		<owl:imports rdf:resource="http://www.i2pm.net/standard-pass-ont"></owl:imports>
 	</owl:Ontology>
 	<owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#AModel" >
@@ -38,7 +38,7 @@
     		<rdf:type rdf:resource="&standard-pass-ont;DoState" ></rdf:type>
     		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ADoState</standard-pass-ont:hasModelComponentID>
     		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A do State</standard-pass-ont:hasModelComponentLabel>
-    		<standard-pass-ont:hasFunctionSpecification rdf:resource="http://opensbpm.org/pass/minimal#ADoStateFunction" ></standard-pass-ont:hasFunctionSpecification>
+    		<!--standard-pass-ont:hasFunctionSpecification rdf:resource="http://opensbpm.org/pass/minimal#ADoStateFunction" ></standard-pass-ont:hasFunctionSpecification-->
     </owl:NamedIndividual>
 
 
