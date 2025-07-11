@@ -2,6 +2,7 @@ package org.opensbpm.spass.matchers;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import org.opensbpm.spass.model.DoState;
 import org.opensbpm.spass.model.PASSProcessModel;
 import org.opensbpm.spass.model.PASSProcessModelElement;
 import org.opensbpm.spass.model.SubjectBehavior;
@@ -110,5 +111,35 @@ public class ModelMatchers {
         };
     }
 
+    public static TypeSafeMatcher<DoState> isDoState(String expectedId, String expectedLabel) {
+        return new TypeSafeMatcher<>() {
+
+            @Override
+            protected boolean matchesSafely(DoState model) {
+                return allOf(
+                        instanceOf(DoState.class),
+                        hasId(expectedId),
+                        hasLabel(expectedLabel)
+                ).matches(model);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("a DoState with id ")
+                        .appendText(" equal to ")
+                        .appendValue(expectedId)
+                        .appendText(" and label equal to ")
+                        .appendValue(expectedLabel);
+            }
+
+            @Override
+            protected void describeMismatchSafely(DoState model, Description mismatchDescription) {
+                mismatchDescription.appendText(" id was ")
+                        .appendValue(model.getId())
+                        .appendText(" and label was ")
+                        .appendValue(model.getLabel());
+            }
+        };
+    }
 
 }

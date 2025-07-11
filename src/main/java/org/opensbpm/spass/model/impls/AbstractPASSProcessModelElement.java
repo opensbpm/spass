@@ -1,11 +1,13 @@
-package org.opensbpm.spass.model;
+package org.opensbpm.spass.model.impls;
+
+import org.opensbpm.spass.model.PASSProcessModelElement;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractPASSProcessModelElement implements PASSProcessModelElement {
+abstract class AbstractPASSProcessModelElement implements PASSProcessModelElement {
 
     protected String id;
     protected String label;
@@ -38,15 +40,15 @@ public abstract class AbstractPASSProcessModelElement implements PASSProcessMode
 
     @Override
     public final <T extends PASSProcessModelElement> Collection<T> getContains(Class<T> passClass) {
-         return contains.stream()
-                 .filter(passClass::isInstance)
-                 .map(passClass::cast)
-                 .toList();
+        return contains.stream()
+                .filter(passClass::isInstance)
+                .map(passClass::cast)
+                .toList();
     }
 
     public abstract AbstractPASSProcessModelElement copy();
 
-    protected static abstract class AbstractBuilder<T extends AbstractPASSProcessModelElement, B extends AbstractBuilder<T, B>> {
+    protected static abstract class AbstractBuilder<E extends PASSProcessModelElement, T extends AbstractPASSProcessModelElement, B extends AbstractBuilder<E, T, B>> {
         protected final T processModelElement;
 
         public AbstractBuilder(T processModelElement) {
@@ -70,7 +72,7 @@ public abstract class AbstractPASSProcessModelElement implements PASSProcessMode
             return self();
         }
 
-        public abstract T build();
+        public abstract E build();
     }
 
 }

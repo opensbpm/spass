@@ -7,35 +7,8 @@ package org.opensbpm.spass.model;
  *
  * @see http://www.i2pm.net/standard-pass-ont#SubjectBehavior
  */
-public class SubjectBehavior extends AbstractPASSProcessModelElement {
-    public static Builder builder() {
-        return new Builder();
-    }
+public interface SubjectBehavior extends PASSProcessModelElement {
 
-    private SubjectBehavior() {
-    }
-
-    private SubjectBehavior(SubjectBehavior copy) {
-        super(copy);
-    }
-
-    public SubjectBehavior copy() {
-        return new SubjectBehavior(this);
-    }
-
-    public static final class Builder extends AbstractBuilder<SubjectBehavior, Builder> {
-
-        private Builder() {
-            super(new SubjectBehavior());
-        }
-
-        @Override
-        protected Builder self() {
-            return this;
-        }
-
-        public SubjectBehavior build() {
-            return processModelElement.copy();
-        }
+    interface Builder extends PASSProcessModelElement.Builder<SubjectBehavior, Builder> {
     }
 }

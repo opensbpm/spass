@@ -1,5 +1,7 @@
 package org.opensbpm.spass;
 
+import org.opensbpm.spass.model.DoState;
+import org.opensbpm.spass.model.PASSFactory;
 import org.opensbpm.spass.model.PASSProcessModel;
 import org.opensbpm.spass.model.SubjectBehavior;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -37,35 +39,58 @@ public class SPassReader {
         //dumpSuperclasses(ontology);
         dumpIndividuals();
 
-        OWLNamedIndividual passModelIndividual = findNamedIndividualByClass(passOwlDataFactory.getPassProcessModelClass())
+        OWLNamedIndividual passModelIndividual = retrieveNamedIndividualByClass(passOwlDataFactory.getPassProcessModelClass())
                 .findFirst()
                 .orElseThrow(() -> new SPassIncompleteException("No PASSProcessModel found in ontology"));
         String id = readDataProperty(passModelIndividual, "hasModelComponentID");
         String label = readDataProperty(passModelIndividual, "hasModelComponentLabel");
 
-        List<SubjectBehavior> subjectBehaviors = findNamedIndividualsByObjectProperty(passModelIndividual, passOwlDataFactory.getContainsProperty())
-                .filter(individual -> hasClass(individual, passOwlDataFactory.getSubjectBehaviorClass()))
+        List<SubjectBehavior> subjectBehaviors = retrieveContainsOfClass(passModelIndividual, passOwlDataFactory.getSubjectBehaviorClass())
                 .map(this::toSubjectBehavior)
                 .toList();
 
-        return PASSProcessModel.builder()
+        return PASSFactory.getInstance().createPassProcessModel()
                 .withId(id)
                 .withLabel(label)
                 .addContains(subjectBehaviors)
                 .build();
     }
 
-    private SubjectBehavior toSubjectBehavior(OWLNamedIndividual individual) {
-        String id = readDataProperty(individual, "hasModelComponentID");
-        String label = readDataProperty(individual, "hasModelComponentLabel");
+    private SubjectBehavior toSubjectBehavior(OWLNamedIndividual subjectBehaviorIndividual) {
+        String id = readDataProperty(subjectBehaviorIndividual, "hasModelComponentID");
+        String label = readDataProperty(subjectBehaviorIndividual, "hasModelComponentLabel");
 
-        return SubjectBehavior.builder()
+        List<DoState> doStates = retrieveContainsOfClass(subjectBehaviorIndividual, passOwlDataFactory.getDoState())
+                .map(this::toDoState)
+                .toList();
+
+        return PASSFactory.getInstance().createSubjectBehavior()
+                .withId(id)
+                .withLabel(label)
+                .addContains(doStates)
+                .build();
+    }
+
+    private DoState toDoState(OWLNamedIndividual subjectBehaviorIndividual) {
+        String id = readDataProperty(subjectBehaviorIndividual, "hasModelComponentID");
+        String label = readDataProperty(subjectBehaviorIndividual, "hasModelComponentLabel");
+
+        return PASSFactory.getInstance().createDoState()
                 .withId(id)
                 .withLabel(label)
                 .build();
     }
 
-    private Stream<OWLNamedIndividual> findNamedIndividualByClass(OWLClass owlClass) {
+    private Stream<OWLNamedIndividual> retrieveContainsOfClass(OWLNamedIndividual namedIndividual, OWLClass owlClass) {
+        return retrieveContains(namedIndividual)
+                .filter(individual -> hasClass(individual, owlClass));
+    }
+
+    private Stream<OWLNamedIndividual> retrieveContains(OWLNamedIndividual namedIndividual) {
+        return retrieveNamedIndividualsByObjectProperty(namedIndividual, passOwlDataFactory.getContainsProperty());
+    }
+
+    private Stream<OWLNamedIndividual> retrieveNamedIndividualByClass(OWLClass owlClass) {
         return ontology.getIndividualsInSignature().stream()
                 .filter(individual -> hasClass(individual, owlClass));
     }
@@ -79,7 +104,7 @@ public class SPassReader {
                 .count() > 0;
     }
 
-    public Stream<OWLNamedIndividual> findNamedIndividualsByObjectProperty(OWLNamedIndividual individual, OWLObjectProperty owlObjectProperty) {
+    public Stream<OWLNamedIndividual> retrieveNamedIndividualsByObjectProperty(OWLNamedIndividual individual, OWLObjectProperty owlObjectProperty) {
         return ontology.getObjectPropertyAssertionAxioms(individual).stream()
                 .filter(ax -> ax.getProperty().isOWLObjectProperty() &&
                         ax.getObject().isNamed() &&
@@ -103,6 +128,14 @@ public class SPassReader {
 
         private OWLClass getSubjectBehaviorClass() {
             return getOwlClass("SubjectBehavior");
+        }
+
+        private OWLClass getStandardPASSState() {
+            return getOwlClass("StandardPASSState");
+        }
+
+        private OWLClass getDoState() {
+            return getOwlClass("DoState");
         }
 
         private OWLClass getOwlClass(String shortName) {

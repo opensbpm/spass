@@ -31,6 +31,15 @@
 		<rdf:type rdf:resource="&standard-pass-ont;SubjectBehavior" ></rdf:type>
 		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ASubjectBehavior</standard-pass-ont:hasModelComponentID>
 		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A SubjectBehavior</standard-pass-ont:hasModelComponentLabel>
+		<standard-pass-ont:contains rdf:resource="http://opensbpm.org/pass/minimal#ADoState" ></standard-pass-ont:contains>
 	</owl:NamedIndividual>
+
+	<owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#ADoState" >
+    		<rdf:type rdf:resource="&standard-pass-ont;DoState" ></rdf:type>
+    		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ADoState</standard-pass-ont:hasModelComponentID>
+    		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A do State</standard-pass-ont:hasModelComponentLabel>
+    		<standard-pass-ont:hasFunctionSpecification rdf:resource="http://opensbpm.org/pass/minimal#ADoStateFunction" ></standard-pass-ont:hasFunctionSpecification>
+    </owl:NamedIndividual>
+
 
 </rdf:RDF>

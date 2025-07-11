@@ -1,10 +1,8 @@
 package org.opensbpm.spass;
 
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
+import org.opensbpm.spass.model.DoState;
 import org.opensbpm.spass.model.PASSProcessModel;
-import org.opensbpm.spass.model.PASSProcessModelElement;
 import org.opensbpm.spass.model.SubjectBehavior;
 
 import java.io.InputStream;
@@ -34,6 +32,17 @@ public class SpassReaderTest {
         assertThat(subjectBehaviors, contains(
                 isSubjectBehavior("ASubjectBehavior", "A SubjectBehavior")
         ));
+
+        SubjectBehavior asubjectBehavior = subjectBehaviors.stream()
+                .filter(subjectBehavior -> subjectBehavior.getId().equals("ASubjectBehavior"))
+                .findFirst()
+                .orElseThrow(AssertionError::new);
+
+        Collection<DoState> doStates = asubjectBehavior.getContains(DoState.class);
+        assertThat(doStates, contains(
+                isDoState("ADoState", "A do State")
+        ));
+
     }
 
 }
