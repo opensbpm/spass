@@ -16,26 +16,17 @@ public class DefaultPASSFactory implements PASSFactory {
         // no instance creation
     }
 
-    public PASSProcessModel.Builder createPassProcessModelBuilder() {
-        return DefaultPASSProcessModel.builder();
-    }
-
+    @Override
     public PASSProcessModel.Mutable createPASSProcessModel() {
         return new MutablePASSProcessModel();
     }
 
-    public SubjectBehavior.Builder createSubjectBehaviorBuilder() {
-        return DefaultSubjectBehavior.builder();
-    }
-
+    @Override
     public SubjectBehavior.Mutable createSubjectBehavior() {
         return new MutableSubjectBehavior();
     }
 
-    public DoState.Builder createDoStateBuilder() {
-        return DefaultDoState.builder();
-    }
-
+    @Override
     public DoState.Mutable createDoState() {
         return new MutableDoState();
     }

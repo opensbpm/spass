@@ -5,18 +5,14 @@ import org.opensbpm.spass.model.PASSProcessModelElement;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLiteral;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-import static org.opensbpm.spass.PassOntology.createIRI;
+import static java.lang.String.format;
+
 import org.opensbpm.spass.model.PASSProcessModelElement.Mutable;
 
 class ModelUtils {
@@ -29,14 +25,22 @@ class ModelUtils {
     }
 
     private static final Map<IRI, ValueConsumer> iriValueConsumer = new HashMap<>();
+
     static {
         iriValueConsumer.put(createIRI("hasModelComponentID"), PASSProcessModelElement.Mutable::setId);
         iriValueConsumer.put(createIRI("hasModelComponentLabel"), PASSProcessModelElement.Mutable::setLabel);
     }
 
     private static final Map<IRI, ObjectConsumer> iriObjectConsumer = new HashMap<>();
+
     static {
         iriObjectConsumer.put(createIRI("contains"), PASSProcessModelElement.Mutable::addContains);
+    }
+
+    private final static String BASE_IRI = "http://www.i2pm.net/standard-pass-ont";
+
+    public static IRI createIRI(String shortName) {
+        return IRI.create(format("%s#%s", BASE_IRI, shortName));
     }
 
     public static Mutable instantiate(OWLClass owlClass) {
@@ -67,6 +71,7 @@ class ModelUtils {
 
     interface ValueConsumer extends BiConsumer<Mutable, String> {
     }
+
     interface ObjectConsumer extends BiConsumer<Mutable, Mutable> {
     }
 
