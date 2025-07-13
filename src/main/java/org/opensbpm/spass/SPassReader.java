@@ -3,17 +3,52 @@ package org.opensbpm.spass;
 import org.opensbpm.spass.model.*;
 import org.opensbpm.spass.model.PASSProcessModelElement.Mutable;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.FileDocumentSource;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.*;
+
+import java.io.File;
 import java.io.InputStream;
 import java.util.*;
+
 import static org.opensbpm.spass.OwlUtils.createLocalIRIMapper;
 
 public class SPassReader {
 
-    public static PASSProcessModel loadOwl(InputStream input) throws SPassIncompleteException, OWLOntologyCreationException {
-        OWLOntology ontology = loadPassOntology(input);
+    /**
+     * Loads a PASSProcessModel from an PASS OWL ontology file.
+     *
+     * @param passFile File containing the PASS OWL ontology.
+     * @return A PASSProcessModel instance populated with data from the ontology.
+     * @throws SPassIncompleteException     If the ontology does not contain a complete PASSProcessModel.
+     * @throws OWLOntologyCreationException If there is an error creating the ontology from the input stream.
+     */
+    public static PASSProcessModel loadOwl(File passFile) throws SPassIncompleteException, OWLOntologyCreationException {
+        return loadOwl(new FileDocumentSource(passFile));
+    }
+
+    /**
+     * Loads a PASSProcessModel from an PASS OWL ontology input stream.
+     *
+     * @param passInputStream InputStream containing the PASS OWL ontology.
+     * @return A PASSProcessModel instance populated with data from the ontology.
+     * @throws SPassIncompleteException     If the ontology does not contain a complete PASSProcessModel.
+     * @throws OWLOntologyCreationException If there is an error creating the ontology from the input stream.
+     */
+    public static PASSProcessModel loadOwl(InputStream passInputStream) throws SPassIncompleteException, OWLOntologyCreationException {
+        return loadOwl(new StreamDocumentSource(passInputStream));
+    }
+
+    private static PASSProcessModel loadOwl(OWLOntologyDocumentSource source) throws SPassIncompleteException, OWLOntologyCreationException {
+        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+
+        // Add custom IRI mapper to redirect external IRI to local file
+        manager.setIRIMappers(Set.of(
+                createLocalIRIMapper("http://www.i2pm.net/standard-pass-ont", "/standard_PASS_ont_dev.owl")
+        ));
+        OWLOntologyLoaderConfiguration config = new OWLOntologyLoaderConfiguration();
+        OWLOntology ontology = manager.loadOntologyFromOntologyDocument(source, config);
 
         OwlUtils.dumpIndividuals(ontology);
 
@@ -40,7 +75,6 @@ public class SPassReader {
                     ModelUtils.consumeObject(propertyIRI, modelElements.get(subject), modelElements.get(object));
                 });
 
-
         return modelElements.values().stream()
                 .filter(element -> element instanceof PASSProcessModel.Mutable)
                 .map(element -> (PASSProcessModel.Mutable) element)
@@ -48,18 +82,6 @@ public class SPassReader {
                     throw new IllegalStateException("Multiple PASSProcessModel found in ontology");
                 })
                 .orElseThrow(() -> new SPassIncompleteException("No PASSProcessModel found in ontology"));
-    }
-
-    private static OWLOntology loadPassOntology(InputStream input) throws OWLOntologyCreationException {
-        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-
-        // Add custom IRI mapper to redirect external IRI to local file
-        manager.setIRIMappers(Set.of(
-                createLocalIRIMapper("http://www.i2pm.net/standard-pass-ont", "/standard_PASS_ont_dev.owl")
-        ));
-        OWLOntologyDocumentSource source = new StreamDocumentSource(input);
-        OWLOntologyLoaderConfiguration config = new OWLOntologyLoaderConfiguration();
-        return manager.loadOntologyFromOntologyDocument(source, config);
     }
 
 }
