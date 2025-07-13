@@ -12,7 +12,4 @@ public interface SubjectBehavior extends PASSProcessModelElement {
     interface Mutable extends SubjectBehavior, PASSProcessModelElement.Mutable {
 
     }
-
-    interface Builder extends PASSProcessModelElement.Builder<SubjectBehavior, Builder> {
-    }
 }

@@ -59,13 +59,4 @@ public interface PASSProcessModelElement {
         void addContains(Collection<? extends PASSProcessModelElement> modelElements);
     }
 
-    interface Builder<T, B extends Builder<T, B>> {
-        B withId(String id);
-
-        B withLabel(String label);
-
-        B addContains(Collection<? extends PASSProcessModelElement> modelElements);
-
-        T build();
-    }
 }

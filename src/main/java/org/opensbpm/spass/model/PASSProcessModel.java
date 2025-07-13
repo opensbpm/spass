@@ -10,8 +10,4 @@ public interface PASSProcessModel extends PASSProcessModelElement {
     interface Mutable extends PASSProcessModel, PASSProcessModelElement.Mutable {
 
     }
-
-    interface Builder extends PASSProcessModelElement.Builder<PASSProcessModel, Builder> {
-
-    }
 }
