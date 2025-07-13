@@ -13,10 +13,6 @@ import static java.util.Arrays.asList;
 
 public class OwlUtils {
 
-    static HashSet<OWLOntologyIRIMapper> asSet(OWLOntologyIRIMapper... iriMappers) {
-        return new HashSet<>(asList(iriMappers));
-    }
-
     static OWLOntologyIRIMapper createLocalIRIMapper(String externalIRI, String localResource) {
         return createLocalIriMapper(
                 IRI.create(externalIRI),
@@ -84,14 +80,10 @@ public class OwlUtils {
 
     static OWLClass getTypeOfIndividual(OWLOntology ontology, OWLNamedIndividual namedIndividual) {
         return getClassesOfIndividual(ontology, namedIndividual)
-                .reduce(onlyOne())
+                .reduce((a, b) -> {
+                    throw new IllegalStateException(format("Multiple OWLClasses found for individual: %s", namedIndividual.getIRI()));
+                })
                 .orElseThrow(() -> new RuntimeException("No OWLClass found for individual: " + namedIndividual.getIRI()));
-    }
-
-    private static BinaryOperator<OWLClass> onlyOne() {
-        return (a, b) -> {
-            throw new IllegalStateException("Stream contains more than one element");
-        };
     }
 
     private static Stream<OWLClass> getClassesOfIndividual(OWLOntology ontology, OWLNamedIndividual namedIndividual) {

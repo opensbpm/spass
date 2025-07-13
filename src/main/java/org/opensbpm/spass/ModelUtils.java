@@ -6,7 +6,6 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLiteral;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -16,63 +15,80 @@ import static java.lang.String.format;
 import org.opensbpm.spass.model.PASSProcessModelElement.Mutable;
 
 class ModelUtils {
-    private static final Map<IRI, ModelInstantiator> iriModelInstantiatorMap = new HashMap<>();
-
-    static {
-        iriModelInstantiatorMap.put(createIRI("PASSProcessModel"), PASSFactory::createPASSProcessModel);
-        iriModelInstantiatorMap.put(createIRI("SubjectBehavior"), PASSFactory::createSubjectBehavior);
-        iriModelInstantiatorMap.put(createIRI("DoState"), PASSFactory::createDoState);
-    }
-
-    private static final Map<IRI, ValueConsumer> iriValueConsumer = new HashMap<>();
-
-    static {
-        iriValueConsumer.put(createIRI("hasModelComponentID"), PASSProcessModelElement.Mutable::setId);
-        iriValueConsumer.put(createIRI("hasModelComponentLabel"), PASSProcessModelElement.Mutable::setLabel);
-    }
-
-    private static final Map<IRI, ObjectConsumer> iriObjectConsumer = new HashMap<>();
-
-    static {
-        iriObjectConsumer.put(createIRI("contains"), PASSProcessModelElement.Mutable::addContains);
-    }
-
     private final static String BASE_IRI = "http://www.i2pm.net/standard-pass-ont";
 
-    public static IRI createIRI(String shortName) {
+    private static final Map<IRI, ModelInstantiator> classInstantiators = Map.of(
+            asIRI("PASSProcessModel"), PASSFactory::createPASSProcessModel,
+            asIRI("SubjectBehavior"), PASSFactory::createSubjectBehavior,
+            asIRI("DoState"), PASSFactory::createDoState
+    );
+
+    private static final Map<IRI, PropertyConsumer> propertyConsumers = Map.of(
+            asIRI("hasModelComponentID"), PASSProcessModelElement.Mutable::setId,
+            asIRI("hasModelComponentLabel"), PASSProcessModelElement.Mutable::setLabel
+    );
+
+    private static final Map<IRI, ObjectConsumer> objectConsumers = Map.of(
+            asIRI("contains"), PASSProcessModelElement.Mutable::addContains
+    );
+
+    private static IRI asIRI(String shortName) {
         return IRI.create(format("%s#%s", BASE_IRI, shortName));
     }
 
-    public static Mutable instantiate(OWLClass owlClass) {
-        if (!iriModelInstantiatorMap.containsKey(owlClass.getIRI())) {
+    /**
+     * Instantiates a mutable PassModelElement based on the given OWLClass.
+     *
+     * @param owlClass the OWLClass representing the PassModelElement
+     * @return a Mutable instance of the PassModelElement
+     * @throws UnsupportedOperationException if the OWLClass does not have a corresponding PassModelElement
+     */
+    public static Mutable instantiateClass(OWLClass owlClass) {
+        if (!classInstantiators.containsKey(owlClass.getIRI())) {
             throw new UnsupportedOperationException(String.format("IRI %s doesn't have an corresponding PassModelElement", owlClass.getIRI()));
         }
-        return iriModelInstantiatorMap.get(owlClass.getIRI()).apply(PASSFactory.getInstance());
+        return classInstantiators.get(owlClass.getIRI()).apply(PASSFactory.getInstance());
     }
 
-    public static void invoke(IRI propertyIRI, Mutable passProcessModelElement, OWLLiteral object) {
-        if (!iriValueConsumer.containsKey(propertyIRI)) {
+    /**
+     * Consumes a property value for a given PassProcessModelElement.
+     *
+     * @param propertyIRI the IRI of the property to consume
+     * @param subject     the PassProcessModelElement to which the property belongs
+     * @param object      the OWLLiteral object representing the property value
+     * @throws UnsupportedOperationException if the propertyIRI does not have a corresponding ValueConsumer
+     */
+    public static void consumeProperty(IRI propertyIRI, Mutable subject, OWLLiteral object) {
+        if (!propertyConsumers.containsKey(propertyIRI)) {
             throw new UnsupportedOperationException(String.format("IRI %s doesn't have an corresponding ValueConsumer", propertyIRI));
         }
-        ValueConsumer valueConsumer = iriValueConsumer.get(propertyIRI);
-        valueConsumer.accept(passProcessModelElement, object.getLiteral());
+        PropertyConsumer valueConsumer = propertyConsumers.get(propertyIRI);
+        valueConsumer.accept(subject, object.getLiteral());
     }
 
-    public static void invoke2(IRI propertyIRI, Mutable subject, Mutable object) {
-        if (!iriObjectConsumer.containsKey(propertyIRI)) {
+    /**
+     * Consumes an object for a given PassProcessModelElement.
+     *
+     * @param propertyIRI the IRI of the property to consume
+     * @param subject     the PassProcessModelElement to which the object belongs
+     * @param object      the Mutable object representing the value of the property
+     * @throws UnsupportedOperationException if the propertyIRI does not have a corresponding ObjectConsumer
+     */
+    public static void consumeObject(IRI propertyIRI, Mutable subject, Mutable object) {
+        if (!objectConsumers.containsKey(propertyIRI)) {
             throw new UnsupportedOperationException(String.format("IRI %s doesn't have an corresponding ValueConsumer", propertyIRI));
         }
-        ObjectConsumer objectConsumer = iriObjectConsumer.get(propertyIRI);
+        ObjectConsumer objectConsumer = objectConsumers.get(propertyIRI);
         objectConsumer.accept(subject, object);
     }
 
-    interface ModelInstantiator extends Function<PASSFactory, Mutable> {
+    private interface ModelInstantiator extends Function<PASSFactory, Mutable> {
     }
 
-    interface ValueConsumer extends BiConsumer<Mutable, String> {
+    private interface PropertyConsumer extends BiConsumer<Mutable, String> {
     }
 
-    interface ObjectConsumer extends BiConsumer<Mutable, Mutable> {
+    private interface ObjectConsumer extends BiConsumer<Mutable, Mutable> {
     }
 
 }
