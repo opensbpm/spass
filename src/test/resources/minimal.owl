@@ -17,14 +17,13 @@
     xmlns:standard-pass-ont="http://www.i2pm.net/standard-pass-ont#"
     >
 	<owl:Ontology rdf:about="http://opensbpm.org/pass/minimal">
-		<owl:versionIRI rdf:resource="http://opensbpm.org/pass/minimal/1"></owl:versionIRI>
 		<owl:imports rdf:resource="http://www.i2pm.net/standard-pass-ont"></owl:imports>
 	</owl:Ontology>
 	<owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#AModel" >
-    		<rdf:type rdf:resource="&standard-pass-ont;PASSProcessModel" ></rdf:type>
-    		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >AProcessModel</standard-pass-ont:hasModelComponentID>
-    		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A Model</standard-pass-ont:hasModelComponentLabel>
-    		<standard-pass-ont:contains rdf:resource="http://opensbpm.org/pass/minimal#ASubjectBehavior" ></standard-pass-ont:contains>
+        <rdf:type rdf:resource="&standard-pass-ont;PASSProcessModel" ></rdf:type>
+        <standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >AProcessModel</standard-pass-ont:hasModelComponentID>
+        <standard-pass-ont:hasModelComponentLabel xml:lang="en" >A Model</standard-pass-ont:hasModelComponentLabel>
+        <standard-pass-ont:contains rdf:resource="http://opensbpm.org/pass/minimal#ASubjectBehavior" ></standard-pass-ont:contains>
     </owl:NamedIndividual>
 
     <owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#ASubjectBehavior" >
@@ -32,14 +31,23 @@
 		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ASubjectBehavior</standard-pass-ont:hasModelComponentID>
 		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A SubjectBehavior</standard-pass-ont:hasModelComponentLabel>
 		<standard-pass-ont:contains rdf:resource="http://opensbpm.org/pass/minimal#ADoState" ></standard-pass-ont:contains>
+		<standard-pass-ont:contains rdf:resource="http://opensbpm.org/pass/minimal#ASendState" ></standard-pass-ont:contains>
 	</owl:NamedIndividual>
 
 	<owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#ADoState" >
-    		<rdf:type rdf:resource="&standard-pass-ont;DoState" ></rdf:type>
-    		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ADoState</standard-pass-ont:hasModelComponentID>
-    		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A do State</standard-pass-ont:hasModelComponentLabel>
-    		<!--standard-pass-ont:hasFunctionSpecification rdf:resource="http://opensbpm.org/pass/minimal#ADoStateFunction" ></standard-pass-ont:hasFunctionSpecification-->
+        <rdf:type rdf:resource="&standard-pass-ont;DoState" ></rdf:type>
+        <standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ADoState</standard-pass-ont:hasModelComponentID>
+        <standard-pass-ont:hasModelComponentLabel xml:lang="en" >A do State</standard-pass-ont:hasModelComponentLabel>
+        <standard-pass-ont:hasFunctionSpecification rdf:resource="http://www.i2pm.net/standard-pass-ont#DefaultFunctionDo1_EnvironmentChoice" ></standard-pass-ont:hasFunctionSpecification>
+        <!--standard-pass-ont:hasFunctionSpecification rdf:resource="http://opensbpm.org/pass/minimal#ADoStateFunction" ></standard-pass-ont:hasFunctionSpecification-->
     </owl:NamedIndividual>
+
+	<owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#ASendState" >
+		<rdf:type rdf:resource="&standard-pass-ont;SendState" ></rdf:type>
+		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ASendState</standard-pass-ont:hasModelComponentID>
+		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A send state</standard-pass-ont:hasModelComponentLabel>
+		<standard-pass-ont:hasFunctionSpecification rdf:resource="http://www.i2pm.net/standard-pass-ont#DefaultFunctionSend" ></standard-pass-ont:hasFunctionSpecification>
+	</owl:NamedIndividual>
 
 
 </rdf:RDF>

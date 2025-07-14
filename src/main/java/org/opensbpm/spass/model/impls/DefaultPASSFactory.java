@@ -1,9 +1,6 @@
 package org.opensbpm.spass.model.impls;
 
-import org.opensbpm.spass.model.DoState;
-import org.opensbpm.spass.model.PASSFactory;
-import org.opensbpm.spass.model.PASSProcessModel;
-import org.opensbpm.spass.model.SubjectBehavior;
+import org.opensbpm.spass.model.*;
 
 public class DefaultPASSFactory implements PASSFactory {
     private final static DefaultPASSFactory INSTANCE = new DefaultPASSFactory();
@@ -29,5 +26,20 @@ public class DefaultPASSFactory implements PASSFactory {
     @Override
     public DoState.Mutable createDoState() {
         return new MutableDoState();
+    }
+
+    @Override
+    public DoFunction.Mutable createDoFunction() {
+        return new MutableDoFunction();
+    }
+
+    @Override
+    public SendState.Mutable createSendState() {
+        return new MutableSendState();
+    }
+
+    @Override
+    public SendFunction.Mutable createSendFunction() {
+        return new MutableSendFunction();
     }
 }

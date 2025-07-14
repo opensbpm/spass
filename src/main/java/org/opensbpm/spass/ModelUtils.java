@@ -1,7 +1,9 @@
 package org.opensbpm.spass;
 
+import org.opensbpm.spass.model.FunctionSpecification;
 import org.opensbpm.spass.model.PASSFactory;
 import org.opensbpm.spass.model.PASSProcessModelElement;
+import org.opensbpm.spass.model.State;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLiteral;
@@ -20,7 +22,10 @@ class ModelUtils {
     private static final Map<IRI, ModelInstantiator> classInstantiators = Map.of(
             asIRI("PASSProcessModel"), PASSFactory::createPASSProcessModel,
             asIRI("SubjectBehavior"), PASSFactory::createSubjectBehavior,
-            asIRI("DoState"), PASSFactory::createDoState
+            asIRI("DoState"), PASSFactory::createDoState,
+            asIRI("DoFunction"), PASSFactory::createDoFunction,
+            asIRI("SendState"), PASSFactory::createSendState,
+            asIRI("SendFunction"), PASSFactory::createSendFunction
     );
 
     private static final Map<IRI, PropertyConsumer> propertyConsumers = Map.of(
@@ -29,7 +34,13 @@ class ModelUtils {
     );
 
     private static final Map<IRI, ObjectConsumer> objectConsumers = Map.of(
-            asIRI("contains"), PASSProcessModelElement.Mutable::addContains
+            asIRI("contains"), PASSProcessModelElement.Mutable::addContains,
+            asIRI("hasFunctionSpecification"), new ObjectConsumer() {
+                @Override
+                public void accept(Mutable mutable, Mutable mutable2) {
+                    ((State.Mutable)mutable).setHasFunctionSpecification((FunctionSpecification) mutable2);
+                }
+            }
     );
 
     private static IRI asIRI(String shortName) {
@@ -88,7 +99,7 @@ class ModelUtils {
     private interface PropertyConsumer extends BiConsumer<Mutable, String> {
     }
 
-    private interface ObjectConsumer extends BiConsumer<Mutable, Mutable> {
+    private interface ObjectConsumer extends BiConsumer<Mutable,Mutable> {
     }
 
 }

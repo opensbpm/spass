@@ -13,4 +13,10 @@ public interface PASSFactory {
     SubjectBehavior.Mutable createSubjectBehavior();
 
     DoState.Mutable createDoState();
+
+    DoFunction.Mutable createDoFunction();
+
+    SendState.Mutable createSendState();
+
+    SendFunction.Mutable createSendFunction();
 }

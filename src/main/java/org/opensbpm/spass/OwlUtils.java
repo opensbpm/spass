@@ -79,17 +79,14 @@ public class OwlUtils {
     }
 
     static OWLClass getTypeOfIndividual(OWLOntology ontology, OWLNamedIndividual namedIndividual) {
-        return getClassesOfIndividual(ontology, namedIndividual)
+        return Stream.concat(Stream.of(ontology), ontology.importsClosure()).flatMap(ont -> ont.classAssertionAxioms(namedIndividual))
+                .map(OWLClassAssertionAxiom::getClassExpression)
+                .map(OWLClassExpression::asOWLClass)
+                .distinct()
                 .reduce((a, b) -> {
                     throw new IllegalStateException(format("Multiple OWLClasses found for individual: %s", namedIndividual.getIRI()));
                 })
                 .orElseThrow(() -> new RuntimeException("No OWLClass found for individual: " + namedIndividual.getIRI()));
-    }
-
-    private static Stream<OWLClass> getClassesOfIndividual(OWLOntology ontology, OWLNamedIndividual namedIndividual) {
-        return ontology.classAssertionAxioms(namedIndividual)
-                .map(OWLClassAssertionAxiom::getClassExpression)
-                .map(OWLClassExpression::asOWLClass);
     }
 
 }

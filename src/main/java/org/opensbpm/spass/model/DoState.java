@@ -9,8 +9,4 @@ public interface DoState extends StandardPASSState {
     interface Mutable extends DoState, StandardPASSState.Mutable {
 
     }
-
-    interface Builder extends PASSProcessModelElement.Builder<DoState, Builder> {
-
-    }
 }
