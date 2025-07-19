@@ -2,5 +2,9 @@
 # Maven
 target/
 
+# IntelliJ IDEA
+.idea/
+
 # Miscellaneous
 *.bak
+

@@ -19,4 +19,8 @@ public interface PASSFactory {
     SendState.Mutable createSendState();
 
     SendFunction.Mutable createSendFunction();
+
+    MessageSpecification.Mutable createMessageSpecification();
+
+    SendTransition.Mutable createSendTransition();
 }

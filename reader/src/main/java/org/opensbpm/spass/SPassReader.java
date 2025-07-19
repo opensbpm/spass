@@ -45,6 +45,8 @@ public class SPassReader {
 
         // Add custom IRI mapper to redirect external IRI to local file
         manager.setIRIMappers(Set.of(
+                createLocalIRIMapper("http://www.imi.kit.edu/abstract-pass-ont", "/ALPS_ont_v_0.8.0.owl"),
+                createLocalIRIMapper("http://www.i2pm.net/standard-pass-ont/1.1.0", "/standard_PASS_ont_dev.owl"),
                 createLocalIRIMapper("http://www.i2pm.net/standard-pass-ont", "/standard_PASS_ont_dev.owl")
         ));
         OWLOntologyLoaderConfiguration config = new OWLOntologyLoaderConfiguration();

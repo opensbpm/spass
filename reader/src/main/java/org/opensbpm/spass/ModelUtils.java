@@ -25,7 +25,9 @@ class ModelUtils {
             asIRI("DoState"), PASSFactory::createDoState,
             asIRI("DoFunction"), PASSFactory::createDoFunction,
             asIRI("SendState"), PASSFactory::createSendState,
-            asIRI("SendFunction"), PASSFactory::createSendFunction
+            asIRI("SendFunction"), PASSFactory::createSendFunction,
+            asIRI("MessageSpecification"), PASSFactory::createMessageSpecification,
+            asIRI("SendTransition"), PASSFactory::createSendTransition
     );
 
     private static final Map<IRI, PropertyConsumer> propertyConsumers = Map.of(

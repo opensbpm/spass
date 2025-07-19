@@ -2,6 +2,9 @@ package org.opensbpm.spass.model.impls;
 
 import org.opensbpm.spass.model.*;
 
+import java.util.Collection;
+import java.util.List;
+
 public class DefaultPASSFactory implements PASSFactory {
     private final static DefaultPASSFactory INSTANCE = new DefaultPASSFactory();
 
@@ -41,5 +44,14 @@ public class DefaultPASSFactory implements PASSFactory {
     @Override
     public SendFunction.Mutable createSendFunction() {
         return new MutableSendFunction();
+    }
+
+    @Override
+    public MessageSpecification.Mutable createMessageSpecification() {
+        return new MutableMessageSpecification();
+    }
+    @Override
+    public SendTransition.Mutable createSendTransition() {
+        return new MutableSendTransition();
     }
 }
