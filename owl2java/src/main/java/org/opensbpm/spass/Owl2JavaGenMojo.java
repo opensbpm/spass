@@ -7,8 +7,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 /**
  * Goal which creates Java files based on OWL input.
@@ -40,25 +38,10 @@ public class Owl2JavaGenMojo extends AbstractMojo {
             f.mkdirs();
         }
 
-
-
-        File touch = new File(f, "touch.txt");
-
-        FileWriter w = null;
         try {
-            w = new FileWriter(touch);
-
-            w.write("touch.java");
-        } catch (IOException e) {
-            throw new MojoExecutionException("Error creating file " + touch, e);
-        } finally {
-            if (w != null) {
-                try {
-                    w.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
+            new JavaGenerator(inputFile, f,packageName).generate();
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         }
     }
 }

@@ -1,32 +1,34 @@
+package org.opensbpm.spass;
+
 import freemarker.template.*;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
 import java.io.*;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class OWL2JavaGenerator {
+public class JavaGenerator {
     private final Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
 
-    public static void main(String[] args) throws Exception {
-        new OWL2JavaGenerator().run("output", "com.generated");
-    }
+    private File inputFile;
+    private File outputDirectory;
+    private String packageName;
 
-    public OWL2JavaGenerator() throws IOException {
+    public JavaGenerator(File inputFile, File outputDirectory, String packageName) {
+        this.inputFile = inputFile;
+        this.outputDirectory = outputDirectory;
+        this.packageName = packageName;
+
         cfg.setDefaultEncoding("UTF-8");
         cfg.setClassLoaderForTemplateLoading(getClass().getClassLoader(), "/templates");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
     }
 
-    public void run(String outputDir, String packageName) throws Exception {
+    public void generate() throws Exception {
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        InputStream passStream = OWL2JavaGenerator.class.getResourceAsStream("/standard_PASS_ont_dev.owl");
-        OWLOntology ontology = manager.loadOntologyFromOntologyDocument(passStream);
+        OWLOntology ontology = manager.loadOntologyFromOntologyDocument(inputFile);
 
         Map<OWLClass, ClassModel> classModels = new HashMap<>();
         for (OWLClass cls : ontology.getClassesInSignature()) {
@@ -69,10 +71,10 @@ public class OWL2JavaGenerator {
                         String propertyType = EntitySearcher.getRanges(objectProperty, ontology)
                                 .findFirst()
                                 .filter(owlClassExpression -> owlClassExpression.isOWLClass())
-                                .map(owlClassExpression ->classModels.get(owlClassExpression.asOWLClass()))
+                                .map(owlClassExpression -> classModels.get(owlClassExpression.asOWLClass()))
                                 .map(cm -> cm.getClassName())
                                 .orElse(null);
-                        if(propertyType == null) {
+                        if (propertyType == null) {
                             System.out.println("Skipping: No range found for property: " + propertyName);
                             continue;
                         }
@@ -97,13 +99,12 @@ public class OWL2JavaGenerator {
             }
         }
 
-
-        File outputDirFile = Path.of(outputDir).toFile();
-        outputDirFile.mkdirs(); // Ensure output directory exists
-        System.out.println("Generating Java classes to "+ outputDirFile.getAbsolutePath());
+        System.out.println("Generating Java classes to " + outputDirectory.getAbsolutePath());
+        File packageDirectory = new File(outputDirectory, packageName.replace('.', '/'));
+        packageDirectory.mkdirs();
         for (ClassModel classModel : classModels.values()) {
             Template template = cfg.getTemplate("class.ftl");
-            File output = new File(outputDir + "/" + classModel.className + ".java");
+            File output = new File(packageDirectory, classModel.className + ".java");
             try (Writer out = new FileWriter(output)) {
                 template.process(classModel, out);
                 System.out.println("Generated: " + output.getPath());
