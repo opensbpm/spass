@@ -1,6 +1,7 @@
 package org.opensbpm.spass;
 
-import freemarker.template.*;
+import org.opensbpm.spass.model.ClassModel;
+import org.opensbpm.spass.model.PropertyModel;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.search.EntitySearcher;
@@ -9,36 +10,23 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JavaGenerator {
-    private final Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
+import static java.lang.String.format;
 
-    private File inputFile;
-    private File outputDirectory;
-    private String packageName;
+public class OwlReader {
 
-    public JavaGenerator(File inputFile, File outputDirectory, String packageName) {
-        this.inputFile = inputFile;
-        this.outputDirectory = outputDirectory;
-        this.packageName = packageName;
-
-        cfg.setDefaultEncoding("UTF-8");
-        cfg.setClassLoaderForTemplateLoading(getClass().getClassLoader(), "/templates");
-        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-    }
-
-    public void generate() throws Exception {
+    public Collection<ClassModel> parse(File inputFile) throws Exception {
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         OWLOntology ontology = manager.loadOntologyFromOntologyDocument(inputFile);
 
         Map<OWLClass, ClassModel> classModels = new HashMap<>();
         for (OWLClass cls : ontology.getClassesInSignature()) {
             String className = getClassName(cls);
-            ClassModel classModel = new ClassModel(packageName, className);
-            classModels.put(cls, classModel);
+            classModels.put(cls, new ClassModel(className));
         }
 
         for (OWLDataProperty dataProperty : ontology.getDataPropertiesInSignature()) {
-            for (OWLClassExpression domain : EntitySearcher.getDomains(dataProperty, ontology).collect(Collectors.toList())) {
+            List<OWLClassExpression> domainExpressions = EntitySearcher.getDomains(dataProperty, ontology).toList();
+            for (OWLClassExpression domain : domainExpressions) {
                 if (domain.isOWLClass()) {
                     OWLClass cls = domain.asOWLClass();
                     ClassModel classModel = classModels.get(cls);
@@ -83,7 +71,7 @@ public class JavaGenerator {
                         System.out.println(propertyName + " is " +
                                 (isFunctional ? "single-valued" : "multi-valued (collection)"));
 
-                        classModel.addProperty(new PropertyModel(propertyName, propertyType));
+                        classModel.addProperty(new PropertyModel(propertyName, propertyType, !isFunctional));
                     }
                 }
             }
@@ -94,22 +82,12 @@ public class JavaGenerator {
                 OWLClassExpression sub = axiom.getSubClass();
                 if (!sub.isAnonymous()) {
                     OWLClass subClass = sub.asOWLClass();
-                    classModels.get(subClass).addExtends(getClassName(parentClass));
+                    classModels.get(subClass).addExtendsType(getClassName(parentClass));
                 }
             }
         }
 
-        System.out.println("Generating Java classes to " + outputDirectory.getAbsolutePath());
-        File packageDirectory = new File(outputDirectory, packageName.replace('.', '/'));
-        packageDirectory.mkdirs();
-        for (ClassModel classModel : classModels.values()) {
-            Template template = cfg.getTemplate("class.ftl");
-            File output = new File(packageDirectory, classModel.className + ".java");
-            try (Writer out = new FileWriter(output)) {
-                template.process(classModel, out);
-                System.out.println("Generated: " + output.getPath());
-            }
-        }
+        return classModels.values();
     }
 
     private static String getClassName(OWLClass cls) {
@@ -161,57 +139,4 @@ public class JavaGenerator {
         return "String";
     }
 
-    public static class ClassModel {
-        private String packageName;
-        private String className;
-        private List<String> extendsClasses = new ArrayList<>();
-        private List<PropertyModel> properties = new ArrayList<>();
-
-        public ClassModel(String packageName, String className) {
-            this.packageName = packageName;
-            this.className = className;
-        }
-
-        public String getPackageName() {
-            return packageName;
-        }
-
-        public String getClassName() {
-            return className;
-        }
-
-        public List<String> getExtendsClasses() {
-            return extendsClasses;
-        }
-
-        public void addExtends(String className) {
-            extendsClasses.add(className);
-        }
-
-        public List<PropertyModel> getProperties() {
-            return properties;
-        }
-
-        public void addProperty(PropertyModel propertyModel) {
-            properties.add(propertyModel);
-        }
-    }
-
-    public static class PropertyModel {
-        private String name;
-        private String type;
-
-        public PropertyModel(String name, String type) {
-            this.name = name;
-            this.type = type;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getType() {
-            return type;
-        }
-    }
 }

@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>reader</module>
-    <module>owl2java</module>
+    <module>owl-gen</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

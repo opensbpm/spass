@@ -60,12 +60,31 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>add-generated-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/owl-gen</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.opensbpm.spass</groupId>
-                <artifactId>owl2java</artifactId>
+                <artifactId>owl-gen</artifactId>
                 <version>1.0-SNAPSHOT</version>
                 <configuration>
                     <inputFile>${project.basedir}/src/main/resources/standard_PASS_ont_dev.owl</inputFile>
-                    <outputDirectory>${project.build.directory}/generated-sources/owl2java</outputDirectory>
+                    <outputDirectory>${project.build.directory}/generated-sources/owl-gen</outputDirectory>
                     <packageName>org.opensbpm.spass.reader</packageName>
                 </configuration>
                 <executions>
