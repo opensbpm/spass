@@ -78,11 +78,11 @@ public class OwlReader {
         }
 
         for (OWLClass parentClass : ontology.getClassesInSignature()) {
-            for (OWLSubClassOfAxiom axiom : ontology.getSubClassAxiomsForSuperClass(parentClass)) {
-                OWLClassExpression sub = axiom.getSubClass();
-                if (!sub.isAnonymous()) {
-                    OWLClass subClass = sub.asOWLClass();
-                    classModels.get(subClass).addExtendsType(getClassName(parentClass));
+            for (OWLSubClassOfAxiom axiom : ontology.getSubClassAxiomsForSubClass(parentClass)) {
+                OWLClassExpression superClassExpr = axiom.getSuperClass();
+                if (!superClassExpr.isAnonymous()) {
+                    OWLClass superClass = superClassExpr.asOWLClass();
+                    classModels.get(parentClass).addExtendsType(getClassName(superClass));
                 }
             }
         }

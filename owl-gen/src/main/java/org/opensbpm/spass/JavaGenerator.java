@@ -42,6 +42,14 @@ class JavaGenerator {
             writeFile(classModel.copyToPackage(apiPackageName), "api.ftl");
 
             ClassModel implClassModel = new ClassModel(implPackageName, format("Mutable%s", classModel.getClassName()));
+
+            if (!classModel.getExtendsTypes().isEmpty()) {
+                String superType = classModel.getExtendsTypes().stream()
+                        .filter(type -> !"SimplePASSElement".contains(type))
+                        .findFirst()
+                        .orElseThrow();
+                implClassModel.addExtendsType("Mutable" + superType);
+            }
             implClassModel.addImplementsType(classModel.getClassName() + ".Mutable");
             implClassModel.setApiPackageName(apiPackageName);
             for (PropertyModel property : classModel.getProperties()) {

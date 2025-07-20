@@ -73,14 +73,9 @@ public class ClassModel {
     public ClassModel copyToPackage(String packageName) {
         ClassModel model = new ClassModel(packageName, className);
         model.properties = new ArrayList<>(properties);
+        model.extendsTypes = new ArrayList<>(extendsTypes);
+        model.implementsTypes = new ArrayList<>(implementsTypes);
         return model;
     }
-
-    public ClassModel copyToClassName(String className) {
-        ClassModel model = new ClassModel(packageName, className);
-        model.properties = new ArrayList<>(properties);
-        return model;
-    }
-
 
 }
