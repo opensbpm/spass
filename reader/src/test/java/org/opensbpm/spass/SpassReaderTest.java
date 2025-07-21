@@ -1,9 +1,9 @@
 package org.opensbpm.spass;
 
 import org.junit.jupiter.api.Test;
-import org.opensbpm.spass.model.DoState;
-import org.opensbpm.spass.model.PASSProcessModel;
-import org.opensbpm.spass.model.SubjectBehavior;
+import org.opensbpm.spass.reader.model.api.DoState;
+import org.opensbpm.spass.reader.model.api.PASSProcessModel;
+import org.opensbpm.spass.reader.model.api.SubjectBehavior;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -28,17 +28,17 @@ public class SpassReaderTest {
         assertThat(processModel, hasLabel("A Model"));
         assertThat(processModel, hasElementCount(1));
 
-        Collection<SubjectBehavior> subjectBehaviors = processModel.getContains(SubjectBehavior.class);
+        Collection<SubjectBehavior> subjectBehaviors = ModelUtils.getContains(processModel, SubjectBehavior.class);
         assertThat(subjectBehaviors, contains(
                 isSubjectBehavior("ASubjectBehavior", "A SubjectBehavior")
         ));
 
         SubjectBehavior asubjectBehavior = subjectBehaviors.stream()
-                .filter(subjectBehavior -> subjectBehavior.getId().equals("ASubjectBehavior"))
+                .filter(subjectBehavior -> subjectBehavior.getHasModelComponentID().equals("ASubjectBehavior"))
                 .findFirst()
                 .orElseThrow(AssertionError::new);
 
-        Collection<DoState> doStates = asubjectBehavior.getContains(DoState.class);
+        Collection<DoState> doStates =  ModelUtils.getContains(asubjectBehavior, DoState.class);
         assertThat(doStates, contains(
                 isDoState("ADoState", "A do State")
         ));

@@ -3,6 +3,11 @@ package org.opensbpm.spass;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.opensbpm.spass.model.ClassModel;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import java.io.File;
 import java.io.InputStream;
@@ -10,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,7 +34,16 @@ public class JavaGeneratorTest {
         File outputDirectory = workDir.toPath().resolve("output").toFile();
         String packageName = "apackage";
 
-        Collection<ClassModel> classModels = asList(new ClassModel("DayTimeTimerTransitionCondition"));
+
+        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+        IRI iri = IRI.create("http://example.com#DayTimeTimerTransitionCondition");
+        OWLClass owlClass = dataFactory.getOWLClass(iri);
+
+        Map<OWLClass,ClassModel> classModels = Map.of(
+                owlClass,
+                new ClassModel("DayTimeTimerTransitionCondition")
+        );
         JavaGenerator javaGenerator = new JavaGenerator(outputDirectory, packageName);
 
         //act

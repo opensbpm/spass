@@ -85,7 +85,7 @@
                 <configuration>
                     <inputFile>${project.basedir}/src/main/resources/standard_PASS_ont_dev.owl</inputFile>
                     <outputDirectory>${project.build.directory}/generated-sources/owl-gen</outputDirectory>
-                    <packageName>org.opensbpm.spass.reader</packageName>
+                    <packageName>org.opensbpm.spass.reader.model</packageName>
                 </configuration>
                 <executions>
                     <execution>

@@ -3,12 +3,14 @@ package org.opensbpm.spass;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.opensbpm.spass.model.ClassModel;
+import org.semanticweb.owlapi.model.OWLClass;
 
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -31,9 +33,9 @@ public class OwlReaderTest {
         OwlReader owlReader = new OwlReader();
 
         //act
-        Collection<ClassModel> classModels = owlReader.parse(inputPath.toFile());
+        Map<OWLClass, ClassModel> classModels = owlReader.parse(inputPath.toFile());
 
         //assert
-        assertThat(classModels, not(empty()));
+        assertThat(classModels.values(), not(empty()));
     }
 }

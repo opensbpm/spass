@@ -6,14 +6,18 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.opensbpm.spass.model.ClassModel;
 import org.opensbpm.spass.model.PropertyModel;
+import org.semanticweb.owlapi.model.OWLClass;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 class JavaGenerator {
 
@@ -31,14 +35,14 @@ class JavaGenerator {
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
     }
 
-    public void generate(Collection<ClassModel> classModels) throws IOException, TemplateException {
+    public void generate(Map<OWLClass,ClassModel> classModels) throws IOException, TemplateException {
         System.out.println("Generating Java classes to " + outputDirectory.getAbsolutePath());
         String apiPackageName = format("%s.api", packageName);
         String implPackageName = format("%s.impl", packageName);
 
         File implPackageDir = new File(outputDirectory, implPackageName.replace('.', '/'));
         implPackageDir.mkdirs();
-        for (ClassModel classModel : classModels) {
+        for (ClassModel classModel : classModels.values()) {
             writeFile(classModel.copyToPackage(apiPackageName), "api.ftl");
 
             ClassModel implClassModel = new ClassModel(implPackageName, format("Mutable%s", classModel.getClassName()));
@@ -59,11 +63,17 @@ class JavaGenerator {
         }
         ClassModel objectFactoryModel = new ClassModel(apiPackageName, "ObjectFactory");
         objectFactoryModel.setImplPackageName(implPackageName);
+        objectFactoryModel.setApiPackageName(apiPackageName);
         ClassModel defaultObjectFactoryModel = new ClassModel(implPackageName, "DefaultObjectFactory");
         defaultObjectFactoryModel.addImplementsType("ObjectFactory");
         defaultObjectFactoryModel.setApiPackageName(apiPackageName);
-        for (ClassModel classModel : classModels) {
-            objectFactoryModel.addProperty(new PropertyModel(classModel.getClassName(), classModel.getClassName()));
+        for (Entry<OWLClass,ClassModel> entry : classModels.entrySet()) {
+            if(asList("SimplePASSElement","AdditionalAttribute","KeyValuePair").contains(entry.getKey().getIRI().getShortForm()) ){
+                continue;
+            }
+            String iriString = entry.getKey().getIRI().getIRIString();
+            ClassModel classModel = entry.getValue();
+            objectFactoryModel.addProperty(new PropertyModel(classModel.getClassName(), classModel.getClassName(), iriString));
             defaultObjectFactoryModel.addProperty(new PropertyModel(classModel.getClassName(), classModel.getClassName()));
         }
         writeFile(objectFactoryModel, "objectfactory.ftl");

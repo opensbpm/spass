@@ -23,7 +23,7 @@ public class ${className}
     }
 
 <#list properties as prop>
-    public ${prop.type} create${prop.name?cap_first}(){
+    public ${prop.type}.Mutable create${prop.name?cap_first}(){
         return new Mutable${prop.type}();
     }
 </#list>

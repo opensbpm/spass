@@ -2,10 +2,10 @@ package org.opensbpm.spass.matchers;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-import org.opensbpm.spass.model.DoState;
-import org.opensbpm.spass.model.PASSProcessModel;
-import org.opensbpm.spass.model.PASSProcessModelElement;
-import org.opensbpm.spass.model.SubjectBehavior;
+import org.opensbpm.spass.reader.model.api.DoState;
+import org.opensbpm.spass.reader.model.api.PASSProcessModel;
+import org.opensbpm.spass.reader.model.api.PASSProcessModelElement;
+import org.opensbpm.spass.reader.model.api.SubjectBehavior;
 
 import static org.hamcrest.Matchers.*;
 
@@ -16,7 +16,7 @@ public class ModelMatchers {
 
             @Override
             protected boolean matchesSafely(PASSProcessModelElement model) {
-                return is(expectedId).matches(model.getId());
+                return is(expectedId).matches(model.getHasModelComponentID());
             }
 
             @Override
@@ -29,7 +29,7 @@ public class ModelMatchers {
             @Override
             protected void describeMismatchSafely(PASSProcessModelElement model, Description mismatchDescription) {
                 mismatchDescription.appendText("was ")
-                        .appendValue(model.getId());
+                        .appendValue(model.getHasModelComponentID());
             }
         };
     }
@@ -39,7 +39,7 @@ public class ModelMatchers {
 
             @Override
             protected boolean matchesSafely(PASSProcessModelElement model) {
-                return is(expectedLabel).matches(model.getLabel());
+                return is(expectedLabel).matches(model.getHasModelComponentLabel());
             }
 
             @Override
@@ -52,7 +52,7 @@ public class ModelMatchers {
             @Override
             protected void describeMismatchSafely(PASSProcessModelElement model, Description mismatchDescription) {
                 mismatchDescription.appendText("was ")
-                        .appendValue(model.getId());
+                        .appendValue(model.getHasModelComponentID());
             }
         };
     }
@@ -104,9 +104,9 @@ public class ModelMatchers {
             @Override
             protected void describeMismatchSafely(SubjectBehavior model, Description mismatchDescription) {
                 mismatchDescription.appendText(" id was ")
-                        .appendValue(model.getId())
+                        .appendValue(model.getHasModelComponentID())
                         .appendText(" and label was ")
-                        .appendValue(model.getLabel());
+                        .appendValue(model.getHasModelComponentLabel());
             }
         };
     }
@@ -135,9 +135,9 @@ public class ModelMatchers {
             @Override
             protected void describeMismatchSafely(DoState model, Description mismatchDescription) {
                 mismatchDescription.appendText(" id was ")
-                        .appendValue(model.getId())
+                        .appendValue(model.getHasModelComponentID())
                         .appendText(" and label was ")
-                        .appendValue(model.getLabel());
+                        .appendValue(model.getHasModelComponentLabel());
             }
         };
     }

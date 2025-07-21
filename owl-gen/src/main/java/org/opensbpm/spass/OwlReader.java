@@ -14,7 +14,7 @@ import static java.lang.String.format;
 
 public class OwlReader {
 
-    public Collection<ClassModel> parse(File inputFile) throws Exception {
+    public Map<OWLClass, ClassModel> parse(File inputFile) throws Exception {
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         OWLOntology ontology = manager.loadOntologyFromOntologyDocument(inputFile);
 
@@ -87,7 +87,7 @@ public class OwlReader {
             }
         }
 
-        return classModels.values();
+        return classModels;
     }
 
     private static String getClassName(OWLClass cls) {

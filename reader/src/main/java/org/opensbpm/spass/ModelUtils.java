@@ -1,46 +1,46 @@
 package org.opensbpm.spass;
 
-import org.opensbpm.spass.model.FunctionSpecification;
-import org.opensbpm.spass.model.PASSFactory;
-import org.opensbpm.spass.model.PASSProcessModelElement;
-import org.opensbpm.spass.model.State;
+import org.opensbpm.spass.reader.model.api.FunctionSpecification;
+import org.opensbpm.spass.reader.model.api.ObjectFactory;
+import org.opensbpm.spass.reader.model.api.PASSProcessModelElement;
+import org.opensbpm.spass.reader.model.api.PASSProcessModelElement.Mutable;
+import org.opensbpm.spass.reader.model.api.State;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLiteral;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import static java.lang.String.format;
 
-import org.opensbpm.spass.model.PASSProcessModelElement.Mutable;
-
 class ModelUtils {
     private final static String BASE_IRI = "http://www.i2pm.net/standard-pass-ont";
 
     private static final Map<IRI, ModelInstantiator> classInstantiators = Map.of(
-            asIRI("PASSProcessModel"), PASSFactory::createPASSProcessModel,
-            asIRI("SubjectBehavior"), PASSFactory::createSubjectBehavior,
-            asIRI("DoState"), PASSFactory::createDoState,
-            asIRI("DoFunction"), PASSFactory::createDoFunction,
-            asIRI("SendState"), PASSFactory::createSendState,
-            asIRI("SendFunction"), PASSFactory::createSendFunction,
-            asIRI("MessageSpecification"), PASSFactory::createMessageSpecification,
-            asIRI("SendTransition"), PASSFactory::createSendTransition
+            asIRI("PASSProcessModel"), ObjectFactory::createPASSProcessModel,
+            asIRI("SubjectBehavior"), ObjectFactory::createSubjectBehavior,
+            asIRI("DoState"), ObjectFactory::createDoState,
+            asIRI("DoFunction"), ObjectFactory::createDoFunction,
+            asIRI("SendState"), ObjectFactory::createSendState,
+            asIRI("SendFunction"), ObjectFactory::createSendFunction,
+            asIRI("MessageSpecification"), ObjectFactory::createMessageSpecification,
+            asIRI("SendTransition"), ObjectFactory::createSendTransition
     );
 
     private static final Map<IRI, PropertyConsumer> propertyConsumers = Map.of(
-            asIRI("hasModelComponentID"), PASSProcessModelElement.Mutable::setId,
-            asIRI("hasModelComponentLabel"), PASSProcessModelElement.Mutable::setLabel
+            asIRI("hasModelComponentID"), PASSProcessModelElement.Mutable::setHasModelComponentID,
+            asIRI("hasModelComponentLabel"), PASSProcessModelElement.Mutable::setHasModelComponentLabel
     );
 
     private static final Map<IRI, ObjectConsumer> objectConsumers = Map.of(
-            asIRI("contains"), PASSProcessModelElement.Mutable::addContains,
+            //asIRI("contains"), PASSProcessModelElement.Mutable::setContains,
             asIRI("hasFunctionSpecification"), new ObjectConsumer() {
                 @Override
                 public void accept(Mutable mutable, Mutable mutable2) {
-                    ((State.Mutable)mutable).setHasFunctionSpecification((FunctionSpecification) mutable2);
+                    //((State.Mutable)mutable).setHasFunctionSpecification((FunctionSpecification) mutable2);
                 }
             }
     );
@@ -60,7 +60,7 @@ class ModelUtils {
         if (!classInstantiators.containsKey(owlClass.getIRI())) {
             throw new UnsupportedOperationException(String.format("IRI %s doesn't have an corresponding PassModelElement", owlClass.getIRI()));
         }
-        return classInstantiators.get(owlClass.getIRI()).apply(PASSFactory.getInstance());
+        return classInstantiators.get(owlClass.getIRI()).apply(ObjectFactory.getInstance());
     }
 
     /**
@@ -95,13 +95,20 @@ class ModelUtils {
         objectConsumer.accept(subject, object);
     }
 
-    private interface ModelInstantiator extends Function<PASSFactory, Mutable> {
+    private interface ModelInstantiator extends Function<ObjectFactory, Mutable> {
     }
 
     private interface PropertyConsumer extends BiConsumer<Mutable, String> {
     }
 
     private interface ObjectConsumer extends BiConsumer<Mutable,Mutable> {
+    }
+
+    public static <T extends PASSProcessModelElement> Collection<T> getContains(PASSProcessModelElement modelElement, Class<T> passClass) {
+        return modelElement.getContains().stream()
+                .filter(passClass::isInstance)
+                .map(passClass::cast)
+                .toList();
     }
 
 }
