@@ -34,7 +34,7 @@ public class PropertyModel {
     }
 
     public String getType() {
-        return isMultiValue() ? format("java.util.Collection<%s>", typeName) : typeName;
+        return isMultiValue() ? format("List<%s>", typeName) : typeName;
     }
 
     public boolean isMultiValue() {

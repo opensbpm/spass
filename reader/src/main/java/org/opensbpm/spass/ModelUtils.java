@@ -36,11 +36,11 @@ class ModelUtils {
     );
 
     private static final Map<IRI, ObjectConsumer> objectConsumers = Map.of(
-            //asIRI("contains"), PASSProcessModelElement.Mutable::setContains,
+            asIRI("contains"), Mutable::addContains,
             asIRI("hasFunctionSpecification"), new ObjectConsumer() {
                 @Override
                 public void accept(Mutable mutable, Mutable mutable2) {
-                    //((State.Mutable)mutable).setHasFunctionSpecification((FunctionSpecification) mutable2);
+                    ((State.Mutable)mutable).addHasFunctionSpecification((FunctionSpecification) mutable2);
                 }
             }
     );
@@ -102,6 +102,9 @@ class ModelUtils {
     }
 
     private interface ObjectConsumer extends BiConsumer<Mutable,Mutable> {
+
+        @Override
+        void accept(Mutable subject, Mutable object);
     }
 
     public static <T extends PASSProcessModelElement> Collection<T> getContains(PASSProcessModelElement modelElement, Class<T> passClass) {

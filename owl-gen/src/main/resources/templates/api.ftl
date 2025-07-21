@@ -1,5 +1,6 @@
 package ${packageName};
 
+import java.util.List;
 public interface ${className}
 <#list extendsTypes>
     extends <#items as type>${type}<#sep>, </#sep></#items>
@@ -16,6 +17,10 @@ public interface ${className}
     {
     <#list properties as prop>
         void set${prop.name?cap_first}(${prop.type} value);
+
+        <#if prop.multiValue>
+            void add${prop.name?cap_first}(${prop.typeName} value);
+        </#if>
     </#list>
     }
 }
