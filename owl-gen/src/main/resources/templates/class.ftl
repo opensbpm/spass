@@ -26,12 +26,12 @@ public class ${className}
     }
 
     <#if prop.multiValue>
-        public void add${prop.name?cap_first}(${prop.typeName} value){
-            if (this.${prop.name} == null) {
-                this.${prop.name} = new java.util.ArrayList<>();
-            }
-            this.${prop.name}.add(value);
+    public void add${prop.name?cap_first}(${prop.typeName} value){
+        if (this.${prop.name} == null) {
+            this.${prop.name} = new java.util.ArrayList<>();
         }
+        this.${prop.name}.add(value);
+    }
     </#if>
 </#list>
 

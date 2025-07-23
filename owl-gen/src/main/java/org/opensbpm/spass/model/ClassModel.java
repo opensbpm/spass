@@ -1,81 +1,64 @@
 package org.opensbpm.spass.model;
 
+import org.semanticweb.owlapi.model.IRI;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public class ClassModel {
-
-    private String packageName;
-    private String apiPackageName;
-    private String implPackageName;
-    private String className;
-    private List<String> extendsTypes = new ArrayList<>();
-    private List<String> implementsTypes = new ArrayList<>();
-    private List<PropertyModel> properties = new ArrayList<>();
-
-    public ClassModel(String className) {
-        this.className = className;
+    public static ClassModel of(IRI iri) {
+        return new ClassModel(Objects.requireNonNull(iri, "IRI cannot be null"));
     }
 
-    public ClassModel(String packageName, String className) {
-        this.packageName = packageName;
-        this.className = className;
+    private final IRI iri;
+    private final String className;
+
+    private List<ClassModel> superTypes = new ArrayList<>();
+    private List<PropertyModel> dataProperties = new ArrayList<>();
+    private List<PropertyModel> objectProperties = new ArrayList<>();
+
+
+    private ClassModel(IRI iri) {
+        this.iri = iri;
+        String className = iri.getShortForm();
+        this.className = className.replace('-', '_'); // Replace hyphens with underscores for Java compatibility
     }
 
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public String getApiPackageName() {
-        return apiPackageName;
-    }
-
-    public void setApiPackageName(String apiPackageName) {
-        this.apiPackageName = apiPackageName;
-    }
-
-    public String getImplPackageName() {
-        return implPackageName;
-    }
-
-    public void setImplPackageName(String implPackageName) {
-        this.implPackageName = implPackageName;
+    public IRI getIri() {
+        return iri;
     }
 
     public String getClassName() {
         return className;
     }
 
-    public List<String> getExtendsTypes() {
-        return extendsTypes;
+    public List<ClassModel> getSuperTypes() {
+        return superTypes;
     }
 
-    public void addExtendsType(String className) {
-        extendsTypes.add(className);
+    public void addSuperType(ClassModel classModel) {
+        superTypes.add(classModel);
     }
 
-    public List<String> getImplementsTypes() {
-        return implementsTypes;
+    public List<PropertyModel> getDataProperties() {
+        return dataProperties;
     }
 
-    public void addImplementsType(String className) {
-        implementsTypes.add(className);
+    public void addDataProperty(PropertyModel propertyModel) {
+        dataProperties.add(propertyModel);
     }
 
-    public List<PropertyModel> getProperties() {
-        return properties;
+    public List<PropertyModel> getObjectProperties() {
+        return objectProperties;
     }
 
-    public void addProperty(PropertyModel propertyModel) {
-        properties.add(propertyModel);
+    public void addObjectProperty(PropertyModel propertyModel) {
+        objectProperties.add(propertyModel);
     }
 
-    public ClassModel copyToPackage(String packageName) {
-        ClassModel model = new ClassModel(packageName, className);
-        model.properties = new ArrayList<>(properties);
-        model.extendsTypes = new ArrayList<>(extendsTypes);
-        model.implementsTypes = new ArrayList<>(implementsTypes);
-        return model;
+    public Stream<PropertyModel> streamProperties() {
+        return Stream.concat(dataProperties.stream(), objectProperties.stream());
     }
-
 }

@@ -16,10 +16,11 @@ public interface ${className}
 </#list>
     {
     <#list properties as prop>
+
         void set${prop.name?cap_first}(${prop.type} value);
 
         <#if prop.multiValue>
-            void add${prop.name?cap_first}(${prop.typeName} value);
+        void add${prop.name?cap_first}(${prop.typeName} value);
         </#if>
     </#list>
     }

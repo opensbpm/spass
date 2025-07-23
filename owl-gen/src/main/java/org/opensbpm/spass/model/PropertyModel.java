@@ -1,28 +1,26 @@
 package org.opensbpm.spass.model;
 
+import org.semanticweb.owlapi.model.IRI;
+
 import static java.lang.String.format;
 
 public class PropertyModel {
     private String name;
     private String typeName;
     private boolean multiValue;
-    private String iri;
+    private IRI iri;
 
-    public PropertyModel(String name, String typeName) {
-        this.name = name;
-        this.typeName = typeName;
-    }
-
-    public PropertyModel(String name, String typeName,String iri) {
+    public PropertyModel(String name, String typeName, IRI iri) {
         this.name = name;
         this.typeName = typeName;
         this.iri = iri;
     }
 
-    public PropertyModel(String name, String typeName, boolean multiValue) {
+    public PropertyModel(String name, String typeName, boolean multiValue, IRI iri) {
         this.name = name;
         this.typeName = typeName;
         this.multiValue = multiValue;
+        this.iri = iri;
     }
 
     public String getName() {
@@ -41,7 +39,7 @@ public class PropertyModel {
         return multiValue;
     }
 
-    public String getIri() {
+    public IRI getIri() {
         return iri;
     }
 

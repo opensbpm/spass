@@ -2,6 +2,7 @@ package org.opensbpm.spass;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.opensbpm.spass.java.JavaClass;
 import org.opensbpm.spass.model.ClassModel;
 import org.semanticweb.owlapi.model.OWLClass;
 
@@ -15,7 +16,6 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.io.FileMatchers.anExistingFile;
 
 public class OwlReaderTest {
 
@@ -33,9 +33,9 @@ public class OwlReaderTest {
         OwlReader owlReader = new OwlReader();
 
         //act
-        Map<OWLClass, ClassModel> classModels = owlReader.parse(inputPath.toFile());
+        Collection<ClassModel> classModels = owlReader.parse(inputPath.toFile());
 
         //assert
-        assertThat(classModels.values(), not(empty()));
+        assertThat(classModels, not(empty()));
     }
 }

@@ -2,6 +2,7 @@ package org.opensbpm.spass;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.opensbpm.spass.java.JavaClass;
 import org.opensbpm.spass.model.ClassModel;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -13,7 +14,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -40,10 +40,7 @@ public class JavaGeneratorTest {
         IRI iri = IRI.create("http://example.com#DayTimeTimerTransitionCondition");
         OWLClass owlClass = dataFactory.getOWLClass(iri);
 
-        Map<OWLClass,ClassModel> classModels = Map.of(
-                owlClass,
-                new ClassModel("DayTimeTimerTransitionCondition")
-        );
+        Collection<ClassModel> classModels = asList(ClassModel.of(iri));
         JavaGenerator javaGenerator = new JavaGenerator(outputDirectory, packageName);
 
         //act

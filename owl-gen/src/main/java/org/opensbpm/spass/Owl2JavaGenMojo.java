@@ -5,6 +5,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.opensbpm.spass.java.JavaClass;
 import org.opensbpm.spass.model.ClassModel;
 import org.semanticweb.owlapi.model.OWLClass;
 
@@ -43,7 +44,7 @@ public class Owl2JavaGenMojo extends AbstractMojo {
         }
 
         try {
-            Map<OWLClass, ClassModel> classModels = new OwlReader().parse(inputFile);
+            Collection<ClassModel> classModels = new OwlReader().parse(inputFile);
             new JavaGenerator(outputDirectory, packageName).generate(classModels);
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);

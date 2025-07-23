@@ -11,17 +11,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableCollection;
 
 public class OwlReader {
 
-    public Map<OWLClass, ClassModel> parse(File inputFile) throws Exception {
+    public Collection<ClassModel> parse(File inputFile) throws Exception {
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         OWLOntology ontology = manager.loadOntologyFromOntologyDocument(inputFile);
 
         Map<OWLClass, ClassModel> classModels = new HashMap<>();
         for (OWLClass cls : ontology.getClassesInSignature()) {
-            String className = getClassName(cls);
-            classModels.put(cls, new ClassModel(className));
+            classModels.put(cls, ClassModel.of(cls.getIRI()));
         }
 
         for (OWLDataProperty dataProperty : ontology.getDataPropertiesInSignature()) {
@@ -38,7 +38,7 @@ public class OwlReader {
                                 .map(owlDataRange -> getJavaTypeForOWLDataRange(owlDataRange))
                                 .orElse("String");
 
-                        classModel.addProperty(new PropertyModel(propertyName, propertyType));
+                        classModel.addDataProperty(new PropertyModel(propertyName, propertyType, dataProperty.getIRI()));
                     }
                 }
             }
@@ -71,7 +71,7 @@ public class OwlReader {
                         System.out.println(propertyName + " is " +
                                 (isFunctional ? "single-valued" : "multi-valued (collection)"));
 
-                        classModel.addProperty(new PropertyModel(propertyName, propertyType, !isFunctional));
+                        classModel.addObjectProperty(new PropertyModel(propertyName, propertyType, !isFunctional, objectProperty.getIRI()));
                     }
                 }
             }
@@ -82,18 +82,12 @@ public class OwlReader {
                 OWLClassExpression superClassExpr = axiom.getSuperClass();
                 if (!superClassExpr.isAnonymous()) {
                     OWLClass superClass = superClassExpr.asOWLClass();
-                    classModels.get(parentClass).addExtendsType(getClassName(superClass));
+                    classModels.get(parentClass).addSuperType(classModels.get(superClass));
                 }
             }
         }
 
-        return classModels;
-    }
-
-    private static String getClassName(OWLClass cls) {
-        String className = cls.getIRI().getShortForm();
-        className = className.replace('-', '_'); // Replace hyphens with underscores for Java compatibility
-        return className;
+        return unmodifiableCollection(classModels.values());
     }
 
     private static Set<OWLClass> getAssertedSubClasses(OWLOntology ontology, OWLClass parentClass) {

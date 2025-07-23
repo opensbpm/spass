@@ -1,5 +1,6 @@
 package org.opensbpm.spass;
 
+import org.opensbpm.spass.reader.model.api.ModelFactory;
 import org.opensbpm.spass.reader.model.api.PASSProcessModel;
 import org.opensbpm.spass.reader.model.api.PASSProcessModelElement.Mutable;
 import org.opensbpm.spass.reader.model.api.ObjectFactory;
@@ -58,7 +59,7 @@ public class SPassReader {
         Map<OWLNamedIndividual, Mutable> modelElements = ontology.individualsInSignature()
                 .map(namedIndividual -> {
                     OWLClass owlClass = OwlUtils.getTypeOfIndividual(ontology, namedIndividual);
-                    Mutable modelElement = ObjectFactory.getModelElement(owlClass.getIRI());
+                    Mutable modelElement = ModelFactory.getInstance().getModelElement(owlClass.getIRI());
                     return Pair.of(namedIndividual, modelElement);
                 })
                 .collect(Pair.toMap());
