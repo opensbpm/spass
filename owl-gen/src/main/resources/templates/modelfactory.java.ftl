@@ -44,7 +44,11 @@ public class ModelFactory {
     private static final Map<IRI, ObjectConsumer> objectConsumers = new HashMap<>();
     static {
     <#list objectProperties as prop>
-        objectConsumers.put(IRI.create("${prop.iri}"), PASSProcessModelElement.Mutable::addContains);
+        <#if prop.multiValue>
+            objectConsumers.put(IRI.create("${prop.iri}"), (ObjectConsumer<${prop.subjectModel.className}.Mutable,${prop.objectModel.className}>)${prop.subjectModel.className}.Mutable::add${prop.name?cap_first});
+        <#else>
+            objectConsumers.put(IRI.create("${prop.iri}"), ${prop.objectModel.className}.Mutable::set${prop.name?cap_first});
+        </#if>
     </#list >
     }
 
@@ -87,7 +91,7 @@ public class ModelFactory {
      * @param object      the Mutable object representing the value of the property
      * @throws UnsupportedOperationException if the propertyIRI does not have a corresponding ObjectConsumer
      */
-    public static void consumeObject(IRI propertyIRI, Mutable subject, Mutable object) {
+    public static void consumeObject(IRI propertyIRI, Mutable subject, PASSProcessModelElement object) {
         if (!objectConsumers.containsKey(propertyIRI)) {
             throw new UnsupportedOperationException(String.format("IRI %s doesn't have an corresponding ValueConsumer", propertyIRI));
         }
@@ -101,9 +105,9 @@ public class ModelFactory {
     private interface PropertyConsumer extends BiConsumer<Mutable, String> {
     }
 
-    private interface ObjectConsumer extends BiConsumer<Mutable, Mutable> {
+    private interface ObjectConsumer<S extends Mutable, O extends PASSProcessModelElement> extends BiConsumer<S, O> {
         @Override
-        void accept(Mutable subject, Mutable object);
+        void accept(S subject, O object);
     }
 
 }

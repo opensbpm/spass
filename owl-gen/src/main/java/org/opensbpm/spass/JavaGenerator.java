@@ -90,7 +90,7 @@ class JavaGenerator {
 
         classModels.stream()
                         .flatMap(classModel-> classModel.getObjectProperties().stream())
-                        .map(JavaProperty::of)
+                        .filter(model -> !asList("hasAdditionalAttribute", "hasKeyValuePair").contains(model.getIri().getShortForm()))
                         .forEach(modelFactory::addObjectProperty);
 
         writeFile(modelFactory, "modelfactory.java.ftl");

@@ -1,6 +1,7 @@
 package org.opensbpm.spass;
 
 import org.opensbpm.spass.model.ClassModel;
+import org.opensbpm.spass.model.ObjectPropertyModel;
 import org.opensbpm.spass.model.PropertyModel;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
@@ -56,22 +57,22 @@ public class OwlReader {
                     if (classModel != null) {
                         String propertyName = objectProperty.getIRI().getShortForm();
 
-                        String propertyType = EntitySearcher.getRanges(objectProperty, ontology)
+                        EntitySearcher.getRanges(objectProperty, ontology)
                                 .findFirst()
                                 .filter(owlClassExpression -> owlClassExpression.isOWLClass())
                                 .map(owlClassExpression -> classModels.get(owlClassExpression.asOWLClass()))
-                                .map(cm -> cm.getClassName())
-                                .orElse(null);
-                        if (propertyType == null) {
-                            System.out.println("Skipping: No range found for property: " + propertyName);
-                            continue;
-                        }
-                        //String propertyType = "Object"; // Default type for object properties
+                                .ifPresent(objectClassModel -> {
+                                    String propertyType = objectClassModel.getClassName();
+//                        if (propertyType == null) {
+//                            System.out.println("Skipping: No range found for property: " + propertyName);
+//                            continue;
+//                        }
+                                    //String propertyType = "Object"; // Default type for object properties
 
-                        System.out.println(propertyName + " is " +
-                                (isFunctional ? "single-valued" : "multi-valued (collection)"));
+                                    System.out.println(propertyName + " is " + (isFunctional ? "single-valued" : "multi-valued (collection)"));
 
-                        classModel.addObjectProperty(new PropertyModel(propertyName, propertyType, !isFunctional, objectProperty.getIRI()));
+                                    classModel.addObjectProperty(new ObjectPropertyModel(classModel, objectClassModel, propertyName, propertyType, !isFunctional, objectProperty.getIRI()));
+                                });
                     }
                 }
             }

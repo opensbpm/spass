@@ -17,7 +17,7 @@ public class ClassModel {
 
     private List<ClassModel> superTypes = new ArrayList<>();
     private List<PropertyModel> dataProperties = new ArrayList<>();
-    private List<PropertyModel> objectProperties = new ArrayList<>();
+    private List<ObjectPropertyModel> objectProperties = new ArrayList<>();
 
 
     private ClassModel(IRI iri) {
@@ -50,11 +50,11 @@ public class ClassModel {
         dataProperties.add(propertyModel);
     }
 
-    public List<PropertyModel> getObjectProperties() {
+    public List<ObjectPropertyModel> getObjectProperties() {
         return objectProperties;
     }
 
-    public void addObjectProperty(PropertyModel propertyModel) {
+    public void addObjectProperty(ObjectPropertyModel propertyModel) {
         objectProperties.add(propertyModel);
     }
 
