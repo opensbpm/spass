@@ -1,11 +1,14 @@
 package ${packageName};
 
+import org.semanticweb.owlapi.model.IRI;
 import java.util.List;
 public interface ${className}
 <#list extendsTypes>
     extends <#items as type>${type}<#sep>, </#sep></#items>
 </#list>
 {
+    IRI getIri();
+
 <#list properties as prop>
     ${prop.type} get${prop.name?cap_first}();
 </#list>

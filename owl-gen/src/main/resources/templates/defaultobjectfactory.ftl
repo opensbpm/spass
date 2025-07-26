@@ -1,6 +1,7 @@
 package ${packageName};
 
 import ${apiPackageName}.*;
+import org.semanticweb.owlapi.model.IRI;
 
 public class ${className}
 <#list extendsTypes>
@@ -23,8 +24,8 @@ public class ${className}
     }
 
 <#list properties as prop>
-    public ${prop.type}.Mutable create${prop.name?cap_first}(){
-        return new Mutable${prop.type}();
+    public ${prop.type}.Mutable create${prop.name?cap_first}(IRI iri) {
+        return new Mutable${prop.type}(iri);
     }
 </#list>
 }

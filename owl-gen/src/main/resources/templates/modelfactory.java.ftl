@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import static java.lang.String.format;
 
@@ -52,11 +52,11 @@ public class ModelFactory {
      * @return a Mutable instance of the PassModelElement
      * @throws UnsupportedOperationException if the OWLClass does not have a corresponding PassModelElement
      */
-    public static PASSProcessModelElement.Mutable getModelElement(IRI iri) {
-        if (!modelInstantiators.containsKey(iri)) {
+    public static PASSProcessModelElement.Mutable createModelElement(OWLClass owlClass, IRI iri) {
+        if (!modelInstantiators.containsKey(owlClass.getIRI())) {
             throw new UnsupportedOperationException(String.format("IRI %s doesn't have a corresponding PassModelElement", iri));
         }
-        return modelInstantiators.get(iri).apply(ObjectFactory.getInstance());
+        return modelInstantiators.get(owlClass.getIRI()).apply(ObjectFactory.getInstance(),iri);
     }
 
     /**
@@ -99,7 +99,10 @@ public class ModelFactory {
         objectConsumer.accept(subject, object);
     }
 
-    private interface ModelInstantiator extends Function<ObjectFactory, Mutable> {
+    private interface ModelInstantiator extends BiFunction<ObjectFactory, IRI, Mutable> {
+
+        @Override
+        Mutable apply(ObjectFactory objectFactory, IRI iri);
     }
 
     private interface PropertyConsumer<S extends Mutable, O> extends BiConsumer<S, O> {

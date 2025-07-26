@@ -17,6 +17,6 @@ public interface ${className}
     }
 
 <#list properties as prop>
-    ${prop.type}.Mutable create${prop.name?cap_first}();
+    ${prop.type}.Mutable create${prop.name?cap_first}(IRI iri);
 </#list>
 }

@@ -58,7 +58,7 @@ public class SPassReader {
         Map<OWLNamedIndividual, Mutable> modelElements = ontology.individualsInSignature()
                 .map(namedIndividual -> {
                     OWLClass owlClass = OwlUtils.getTypeOfIndividual(ontology, namedIndividual);
-                    Mutable modelElement = ModelFactory.getModelElement(owlClass.getIRI());
+                    Mutable modelElement = ModelFactory.createModelElement(owlClass, namedIndividual.getIRI());
                     return Pair.of(namedIndividual, modelElement);
                 })
                 .collect(Pair.toMap());

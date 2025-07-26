@@ -93,6 +93,8 @@ class JavaGenerator {
                         .forEach(modelFactory::addObjectProperty);
 
         writeFile(modelFactory, "modelfactory.java.ftl");
+        writeFile(new JavaClass(implPackageName,"AbstractElement"), "abstractelement.ftl");
+
     }
 
     private void writeFile(JavaClass javaClass, String templateName) throws IOException, TemplateException {

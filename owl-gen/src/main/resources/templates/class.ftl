@@ -1,11 +1,14 @@
 package ${packageName};
 
 import ${apiPackageName}.*;
+import org.semanticweb.owlapi.model.IRI;
 import java.util.List;
 
 public class ${className}
 <#list extendsTypes>
     extends <#items as type>${type}<#sep>, </#sep></#items>
+<#else>
+    extends AbstractElement
 </#list>
 <#list implementsTypes>
     implements <#items as type>${type}<#sep>, </#sep></#items>
@@ -14,6 +17,10 @@ public class ${className}
 <#list properties as prop>
     private ${prop.type} ${prop.name};
 </#list>
+
+    public ${className}(IRI iri) {
+        super(iri);
+    }
 
 <#list properties as prop>
 
@@ -34,5 +41,21 @@ public class ${className}
     }
     </#if>
 </#list>
+
+    @Override
+    public String toString() {
+        return "${className}{" +
+            "iri=" + getIri() +
+            ", properties=" + propertiesToString() +
+            '}';
+    }
+
+    private String propertiesToString() {
+        StringBuilder sb = new StringBuilder();
+        <#list properties as prop>
+            sb.append("${prop.name}=").append(${prop.name}).append(", ");
+        </#list>
+        return sb.toString();
+    }
 
 }
