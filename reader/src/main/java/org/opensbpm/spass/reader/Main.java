@@ -13,28 +13,23 @@ public class Main {
     public static void main(String[] args) throws SPassIncompleteException, OWLOntologyCreationException {
         PASSProcessModel passProcessModel = SPassReader.loadOwl(new File(args[0]));
         System.out.println("Loaded PASS Process Model: " + passProcessModel.getHasModelComponentID());
-        visit(passProcessModel);
+        new VisitContext(new Visitor() {
+            @Override
+            public void visit(PASSProcessModelElement element) {
+                System.out.println("Element ID: " + element.getHasModelComponentID() + ", Label: " + element.getHasModelComponentLabel());
+            }
+
+            @Override
+            public void visitDoState(DoState element) {
+                System.out.println("DoState ID: " + element.getHasModelComponentID() + ", Label: " + element.getHasModelComponentLabel());
+            }
+
+            @Override
+            public void visitFunctionSpecification(FunctionSpecification element) {
+                System.out.println("Function Specification ID: " + element.getHasModelComponentID() + ", Label: " + element.getHasModelComponentLabel());
+            }
+
+        }).visit(passProcessModel);
     }
 
-    private static void visit(PASSProcessModelElement element) {
-        if (element instanceof DoState) {
-            visitDoState((DoState) element);
-        } else {
-            System.out.println("Element ID: " + element.getHasModelComponentID() + ", Label: " + element.getHasModelComponentLabel());
-        }
-        if (element.getContains() != null) {
-            element.getContains().forEach(Main::visit);
-        }
-    }
-
-    private static void visitDoState(DoState element) {
-        System.out.println("DoState ID: " + element.getHasModelComponentID() + ", Label: " + element.getHasModelComponentLabel());
-        if (element.getHasFunctionSpecification() != null) {
-            element.getHasFunctionSpecification().forEach(Main::visitFunctionSpecification);
-        }
-    }
-
-    private static void visitFunctionSpecification(FunctionSpecification element) {
-        System.out.println("Function Specification ID: " + element.getHasModelComponentID() + ", Label: " + element.getHasModelComponentLabel());
-    }
 }
