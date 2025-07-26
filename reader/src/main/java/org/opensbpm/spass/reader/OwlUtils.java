@@ -1,15 +1,12 @@
-package org.opensbpm.spass;
+package org.opensbpm.spass.reader;
 
 import org.semanticweb.owlapi.model.*;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 public class OwlUtils {
 

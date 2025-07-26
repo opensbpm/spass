@@ -85,7 +85,6 @@ class JavaGenerator {
 
         classModels.stream()
                 .flatMap(classModel-> classModel.getDataProperties().stream())
-                .map(JavaProperty::of)
                 .forEach(modelFactory::addDataProperty);
 
         classModels.stream()

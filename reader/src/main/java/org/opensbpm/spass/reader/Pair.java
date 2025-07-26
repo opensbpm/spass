@@ -1,4 +1,4 @@
-package org.opensbpm.spass;
+package org.opensbpm.spass.reader;
 
 import java.util.Map;
 import java.util.stream.Collector;

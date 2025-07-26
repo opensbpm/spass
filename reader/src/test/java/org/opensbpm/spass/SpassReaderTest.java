@@ -1,9 +1,9 @@
 package org.opensbpm.spass;
 
 import org.junit.jupiter.api.Test;
-import org.opensbpm.spass.reader.model.api.DoState;
-import org.opensbpm.spass.reader.model.api.PASSProcessModel;
-import org.opensbpm.spass.reader.model.api.SubjectBehavior;
+import org.opensbpm.spass.reader.ModelUtils;
+import org.opensbpm.spass.reader.SPassReader;
+import org.opensbpm.spass.reader.model.api.*;
 
 import java.io.InputStream;
 import java.util.Collection;

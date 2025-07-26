@@ -39,7 +39,7 @@ public class OwlReader {
                                 .map(owlDataRange -> getJavaTypeForOWLDataRange(owlDataRange))
                                 .orElse("String");
 
-                        classModel.addDataProperty(new PropertyModel(propertyName, propertyType, dataProperty.getIRI()));
+                        classModel.addDataProperty(new PropertyModel(classModel, propertyName, propertyType, dataProperty.getIRI()));
                     }
                 }
             }

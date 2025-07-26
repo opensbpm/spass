@@ -1,9 +1,8 @@
-package org.opensbpm.spass;
+package org.opensbpm.spass.reader;
 
 import org.opensbpm.spass.reader.model.api.ModelFactory;
 import org.opensbpm.spass.reader.model.api.PASSProcessModel;
 import org.opensbpm.spass.reader.model.api.PASSProcessModelElement.Mutable;
-import org.opensbpm.spass.reader.model.api.ObjectFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.FileDocumentSource;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -14,7 +13,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.*;
 
-import static org.opensbpm.spass.OwlUtils.createLocalIRIMapper;
+import static org.opensbpm.spass.reader.OwlUtils.createLocalIRIMapper;
 
 public class SPassReader {
 
@@ -59,7 +58,7 @@ public class SPassReader {
         Map<OWLNamedIndividual, Mutable> modelElements = ontology.individualsInSignature()
                 .map(namedIndividual -> {
                     OWLClass owlClass = OwlUtils.getTypeOfIndividual(ontology, namedIndividual);
-                    Mutable modelElement = ModelFactory.getInstance().getModelElement(owlClass.getIRI());
+                    Mutable modelElement = ModelFactory.getModelElement(owlClass.getIRI());
                     return Pair.of(namedIndividual, modelElement);
                 })
                 .collect(Pair.toMap());
@@ -68,7 +67,7 @@ public class SPassReader {
                 .forEach(dataPropertyAssertion -> {
                     IRI propertyIRI = dataPropertyAssertion.getProperty().asOWLDataProperty().getIRI();
                     OWLNamedIndividual subject = dataPropertyAssertion.getSubject().asOWLNamedIndividual();
-                    ModelUtils.consumeProperty(propertyIRI, modelElements.get(subject), dataPropertyAssertion.getObject());
+                    ModelFactory.consumeProperty(propertyIRI, modelElements.get(subject), dataPropertyAssertion.getObject());
                 });
 
         ontology.axioms(AxiomType.OBJECT_PROPERTY_ASSERTION)
@@ -76,7 +75,7 @@ public class SPassReader {
                     IRI propertyIRI = objectPropertyAssertion.getProperty().asOWLObjectProperty().getIRI();
                     OWLNamedIndividual subject = objectPropertyAssertion.getSubject().asOWLNamedIndividual();
                     OWLNamedIndividual object = objectPropertyAssertion.getObject().asOWLNamedIndividual();
-                    ModelUtils.consumeObject(propertyIRI, modelElements.get(subject), modelElements.get(object));
+                    ModelFactory.consumeObject(propertyIRI, modelElements.get(subject), modelElements.get(object));
                 });
 
         return modelElements.values().stream()

@@ -5,12 +5,14 @@ import org.semanticweb.owlapi.model.IRI;
 import static java.lang.String.format;
 
 public class PropertyModel {
+    private ClassModel subjectModel;
     private String name;
     private String typeName;
     private boolean multiValue;
     private IRI iri;
 
-    public PropertyModel(String name, String typeName, IRI iri) {
+    public PropertyModel(ClassModel subjectModel, String name, String typeName, IRI iri) {
+        this.subjectModel = subjectModel;
         this.name = name;
         this.typeName = typeName;
         this.iri = iri;
@@ -21,6 +23,10 @@ public class PropertyModel {
         this.typeName = typeName;
         this.multiValue = multiValue;
         this.iri = iri;
+    }
+
+    public ClassModel getSubjectModel() {
+        return subjectModel;
     }
 
     public String getName() {

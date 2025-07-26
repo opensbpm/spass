@@ -1,4 +1,4 @@
-package org.opensbpm.spass;
+package org.opensbpm.spass.reader;
 
 public class SPassIncompleteException extends  Exception {
     public SPassIncompleteException(String message) {

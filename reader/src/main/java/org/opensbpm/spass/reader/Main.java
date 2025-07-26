@@ -1,4 +1,4 @@
-package org.opensbpm.spass;
+package org.opensbpm.spass.reader;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 

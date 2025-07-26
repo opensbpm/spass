@@ -18,14 +18,6 @@ import java.util.function.Function;
 import static java.lang.String.format;
 
 public class ModelFactory {
-    private static ModelFactory INSTANCE;
-
-    public static synchronized ModelFactory getInstance() {
-        if( INSTANCE == null) {
-            INSTANCE = new ModelFactory();
-        }
-        return INSTANCE;
-    }
 
     private static Map<IRI, ModelInstantiator> modelInstantiators = new HashMap<>();
     static {
@@ -37,7 +29,7 @@ public class ModelFactory {
     private static final Map<IRI, PropertyConsumer> propertyConsumers = new HashMap<>();
     static {
     <#list dataProperties as prop>
-        propertyConsumers.put(IRI.create("${prop.iri}"), PASSProcessModelElement.Mutable::setHasModelComponentID);
+        propertyConsumers.put(IRI.create("${prop.iri}"), (PropertyConsumer<${prop.subjectModel.className}.Mutable,${prop.typeName}>)${prop.subjectModel.className}.Mutable::set${prop.name?cap_first});
     </#list >
     }
 
@@ -60,7 +52,7 @@ public class ModelFactory {
      * @return a Mutable instance of the PassModelElement
      * @throws UnsupportedOperationException if the OWLClass does not have a corresponding PassModelElement
      */
-    public PASSProcessModelElement.Mutable getModelElement(IRI iri) {
+    public static PASSProcessModelElement.Mutable getModelElement(IRI iri) {
         if (!modelInstantiators.containsKey(iri)) {
             throw new UnsupportedOperationException(String.format("IRI %s doesn't have a corresponding PassModelElement", iri));
         }
@@ -80,7 +72,15 @@ public class ModelFactory {
             throw new UnsupportedOperationException(String.format("IRI %s doesn't have a corresponding ValueConsumer", propertyIRI));
         }
         PropertyConsumer valueConsumer = propertyConsumers.get(propertyIRI);
-        valueConsumer.accept(subject, object.getLiteral());
+        Object value;
+        if(object.isBoolean()){
+            value = Boolean.valueOf(object.parseBoolean());
+        }else if(object.isLiteral()){
+            value = object.getLiteral();
+        }else
+            throw new UnsupportedOperationException(String.format("Literal %s is not a supported yet", object));
+
+        valueConsumer.accept(subject, value);
     }
 
     /**
@@ -102,7 +102,7 @@ public class ModelFactory {
     private interface ModelInstantiator extends Function<ObjectFactory, Mutable> {
     }
 
-    private interface PropertyConsumer extends BiConsumer<Mutable, String> {
+    private interface PropertyConsumer<S extends Mutable, O> extends BiConsumer<S, O> {
     }
 
     private interface ObjectConsumer<S extends Mutable, O extends PASSProcessModelElement> extends BiConsumer<S, O> {
