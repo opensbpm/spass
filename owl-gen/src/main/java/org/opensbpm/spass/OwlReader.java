@@ -8,6 +8,7 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,8 +22,15 @@ public class OwlReader {
         OWLOntology ontology = manager.loadOntologyFromOntologyDocument(inputFile);
 
         Map<OWLClass, ClassModel> classModels = new HashMap<>();
-        for (OWLClass cls : ontology.getClassesInSignature()) {
-            classModels.put(cls, ClassModel.of(cls.getIRI()));
+        for (OWLClass owlClass : ontology.getClassesInSignature()) {
+            String comment = EntitySearcher.getAnnotations(owlClass, ontology,
+                            ontology.getOWLOntologyManager().getOWLDataFactory().getRDFSComment())
+                    .filter(a -> a.getValue().isLiteral())
+                    .map(a -> a.getValue().asLiteral().get().getLiteral())
+                    .findFirst()
+                    .orElse(null);
+
+            classModels.put(owlClass, ClassModel.of(owlClass.getIRI(), comment));
         }
 
         for (OWLDataProperty dataProperty : ontology.getDataPropertiesInSignature()) {

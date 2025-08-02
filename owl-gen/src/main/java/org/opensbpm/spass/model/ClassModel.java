@@ -8,22 +8,24 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class ClassModel {
-    public static ClassModel of(IRI iri) {
-        return new ClassModel(Objects.requireNonNull(iri, "IRI cannot be null"));
+    public static ClassModel of(IRI iri, String comment) {
+        return new ClassModel(Objects.requireNonNull(iri, "IRI cannot be null"),comment);
     }
 
     private final IRI iri;
     private final String className;
+    private final String comment;
 
     private List<ClassModel> superTypes = new ArrayList<>();
     private List<PropertyModel> dataProperties = new ArrayList<>();
     private List<ObjectPropertyModel> objectProperties = new ArrayList<>();
 
 
-    private ClassModel(IRI iri) {
+    private ClassModel(IRI iri, String comment) {
         this.iri = iri;
         String className = iri.getShortForm();
         this.className = className.replace('-', '_'); // Replace hyphens with underscores for Java compatibility
+        this.comment = comment;
     }
 
     public IRI getIri() {
@@ -32,6 +34,10 @@ public class ClassModel {
 
     public String getClassName() {
         return className;
+    }
+
+    public String getComment() {
+        return comment;
     }
 
     public List<ClassModel> getSuperTypes() {

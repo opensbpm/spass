@@ -40,7 +40,7 @@ public class JavaGeneratorTest {
         IRI iri = IRI.create("http://example.com#DayTimeTimerTransitionCondition");
         OWLClass owlClass = dataFactory.getOWLClass(iri);
 
-        Collection<ClassModel> classModels = asList(ClassModel.of(iri));
+        Collection<ClassModel> classModels = asList(ClassModel.of(iri, "A comment"));
         JavaGenerator javaGenerator = new JavaGenerator(outputDirectory, packageName);
 
         //act

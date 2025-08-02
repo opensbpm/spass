@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 import static java.lang.String.format;
@@ -29,7 +30,7 @@ class JavaGenerator {
         this.packageName = packageName;
 
         cfg = new Configuration(Configuration.VERSION_2_3_32);
-        cfg.setDefaultEncoding("UTF-8");
+        cfg.setDefaultEncoding(StandardCharsets.UTF_8.name());
         cfg.setClassLoaderForTemplateLoading(getClass().getClassLoader(), "/templates");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
     }
@@ -45,6 +46,7 @@ class JavaGenerator {
             writeFile(JavaClass.of(classModel, apiPackageName), "api.ftl");
 
             JavaClass implJavaClass = new JavaClass(implPackageName, format("Mutable%s", classModel.getClassName()));
+            implJavaClass.setComment(classModel.getComment());
 
             if (!classModel.getSuperTypes().isEmpty()) {
                 String superType = classModel.getSuperTypes().stream()
@@ -72,7 +74,7 @@ class JavaGenerator {
         modelFactory.setImplPackageName(implPackageName);
         modelFactory.setApiPackageName(apiPackageName);
         for (ClassModel classModel : classModels) {
-            if(asList("SimplePASSElement","AdditionalAttribute","KeyValuePair").contains(classModel.getIri().getShortForm()) ){
+            if (asList("SimplePASSElement", "AdditionalAttribute", "KeyValuePair").contains(classModel.getIri().getShortForm())) {
                 continue;
             }
             String iriString = classModel.getIri().getIRIString();
@@ -84,16 +86,16 @@ class JavaGenerator {
         writeFile(defaultObjectFactoryModel, "defaultobjectfactory.ftl");
 
         classModels.stream()
-                .flatMap(classModel-> classModel.getDataProperties().stream())
+                .flatMap(classModel -> classModel.getDataProperties().stream())
                 .forEach(modelFactory::addDataProperty);
 
         classModels.stream()
-                        .flatMap(classModel-> classModel.getObjectProperties().stream())
-                        .filter(model -> !asList("hasAdditionalAttribute", "hasKeyValuePair").contains(model.getIri().getShortForm()))
-                        .forEach(modelFactory::addObjectProperty);
+                .flatMap(classModel -> classModel.getObjectProperties().stream())
+                .filter(model -> !asList("hasAdditionalAttribute", "hasKeyValuePair").contains(model.getIri().getShortForm()))
+                .forEach(modelFactory::addObjectProperty);
 
         writeFile(modelFactory, "modelfactory.java.ftl");
-        writeFile(new JavaClass(implPackageName,"AbstractElement"), "abstractelement.ftl");
+        writeFile(new JavaClass(implPackageName, "AbstractElement"), "abstractelement.ftl");
 
     }
 
@@ -102,7 +104,7 @@ class JavaGenerator {
         packageDir.mkdirs();
 
         File outFile = new File(packageDir, javaClass.getClassName() + ".java");
-        try (Writer out = new FileWriter(outFile)) {
+        try (Writer out = new FileWriter(outFile, StandardCharsets.UTF_8)) {
             Template template = cfg.getTemplate(templateName);
             template.process(javaClass, out);
             System.out.println("Generated: " + outFile.getPath());

@@ -2,6 +2,12 @@ package ${packageName};
 
 import org.semanticweb.owlapi.model.IRI;
 import java.util.List;
+
+<#if comment?has_content>
+/**
+ * ${comment}
+ */
+</#if>
 public interface ${className}
 <#list extendsTypes>
     extends <#items as type>${type}<#sep>, </#sep></#items>

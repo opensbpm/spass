@@ -12,6 +12,7 @@ public class JavaClass {
 
     public static JavaClass of(ClassModel classModel, String packageName) {
         JavaClass javaClass = new JavaClass(packageName, classModel.getClassName());
+        javaClass.setComment(classModel.getComment());
         javaClass.properties = classModel.streamProperties()
                 .map(JavaProperty::of)
                 .collect(Collectors.toList());
@@ -24,6 +25,7 @@ public class JavaClass {
     }
 
     private String packageName;
+    private String comment;
     private String apiPackageName;
     private String implPackageName;
     private String className;
@@ -42,6 +44,14 @@ public class JavaClass {
 
     public String getPackageName() {
         return packageName;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public String getApiPackageName() {
