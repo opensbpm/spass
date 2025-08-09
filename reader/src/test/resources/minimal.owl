@@ -23,7 +23,15 @@
         <rdf:type rdf:resource="&standard-pass-ont;PASSProcessModel" ></rdf:type>
         <standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >AProcessModel</standard-pass-ont:hasModelComponentID>
         <standard-pass-ont:hasModelComponentLabel xml:lang="en" >A Model</standard-pass-ont:hasModelComponentLabel>
+        <standard-pass-ont:hasStartSubject rdf:resource="http://opensbpm.org/pass/minimal#AStartSubject" />
         <standard-pass-ont:contains rdf:resource="http://opensbpm.org/pass/minimal#ASubjectBehavior" ></standard-pass-ont:contains>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#AStartSubject" >
+    		<rdf:type rdf:resource="&standard-pass-ont;StartSubject" ></rdf:type>
+    		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ASubjectBehavior</standard-pass-ont:hasModelComponentID>
+    		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A SubjectBehavior</standard-pass-ont:hasModelComponentLabel>
+    		<standard-pass-ont:containsBehavior rdf:resource="http://opensbpm.org/pass/minimal#ASubjectBehavior" />
     </owl:NamedIndividual>
 
     <owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#ASubjectBehavior" >
@@ -40,6 +48,14 @@
         <standard-pass-ont:hasModelComponentLabel xml:lang="en" >A do State</standard-pass-ont:hasModelComponentLabel>
         <standard-pass-ont:hasFunctionSpecification rdf:resource="http://www.i2pm.net/standard-pass-ont#DefaultFunctionDo1_EnvironmentChoice" ></standard-pass-ont:hasFunctionSpecification>
         <!--standard-pass-ont:hasFunctionSpecification rdf:resource="http://opensbpm.org/pass/minimal#ADoStateFunction" ></standard-pass-ont:hasFunctionSpecification-->
+        <standard-pass-ont:hasOutgoingTransition rdf:resource="http://opensbpm.org/pass/minimal#ATransition" ></standard-pass-ont:hasOutgoingTransition>
+    </owl:NamedIndividual>
+
+	<owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#ATransition" >
+		<rdf:type rdf:resource="&standard-pass-ont;Transition" ></rdf:type>
+        <standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ATransition</standard-pass-ont:hasModelComponentID>
+        <standard-pass-ont:hasModelComponentLabel xml:lang="en" >A transition</standard-pass-ont:hasModelComponentLabel>
+        <standard-pass-ont:hasTargetState rdf:resource="http://opensbpm.org/pass/minimal#ASendState" ></standard-pass-ont:hasTargetState>
     </owl:NamedIndividual>
 
 	<owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#ASendState" >
