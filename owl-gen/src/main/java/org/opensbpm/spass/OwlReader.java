@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableCollection;
 
 public class OwlReader {
@@ -53,38 +54,73 @@ public class OwlReader {
             }
         }
 
+        Map<OWLObjectProperty, ObjectPropertyModel> objectPropertyModels = new HashMap<>();
+
         for (OWLObjectProperty objectProperty : ontology.getObjectPropertiesInSignature()) {
             boolean isFunctional = ontology.getAxioms(AxiomType.FUNCTIONAL_OBJECT_PROPERTY)
                     .stream()
                     .anyMatch(ax -> ax.getProperty().equals(objectProperty));
+            boolean hasInversOf = ontology.getAxioms(AxiomType.INVERSE_OBJECT_PROPERTIES)
+                    .stream()
+                    .anyMatch(ax -> ax.getFirstProperty().equals(objectProperty));
 
-            for (OWLClassExpression domain : EntitySearcher.getDomains(objectProperty, ontology).collect(Collectors.toList())) {
-                if (domain.isOWLClass()) {
-                    OWLClass cls = domain.asOWLClass();
-                    ClassModel classModel = classModels.get(cls);
-                    if (classModel != null) {
-                        String propertyName = objectProperty.getIRI().getShortForm();
+            String propertyName = objectProperty.getIRI().getShortForm();
 
-                        EntitySearcher.getRanges(objectProperty, ontology)
-                                .findFirst()
-                                .filter(owlClassExpression -> owlClassExpression.isOWLClass())
-                                .map(owlClassExpression -> classModels.get(owlClassExpression.asOWLClass()))
-                                .ifPresent(objectClassModel -> {
-                                    String propertyType = objectClassModel.getClassName();
+            EntitySearcher.getRanges(objectProperty, ontology)
+                    .findFirst()
+                    .filter(owlClassExpression -> owlClassExpression.isOWLClass())
+                    .map(owlClassExpression -> classModels.get(owlClassExpression.asOWLClass()))
+                    .ifPresent(objectClassModel -> {
+                        String propertyType = objectClassModel.getClassName();
 //                        if (propertyType == null) {
 //                            System.out.println("Skipping: No range found for property: " + propertyName);
 //                            continue;
 //                        }
-                                    //String propertyType = "Object"; // Default type for object properties
+                        //String propertyType = "Object"; // Default type for object properties
 
-                                    System.out.println(propertyName + " is " + (isFunctional ? "single-valued" : "multi-valued (collection)"));
+                        Set<OWLObjectPropertyExpression> inversProperties = EntitySearcher.getInverses(objectProperty, ontology)
+                                .collect(Collectors.toSet());
 
-                                    classModel.addObjectProperty(new ObjectPropertyModel(classModel, objectClassModel, propertyName, propertyType, !isFunctional, objectProperty.getIRI()));
-                                });
-                    }
-                }
+                        //System.out.println(propertyName + " is " + (isFunctional ? "single-valued" : "multi-valued (collection)"));
+                        System.out.println(propertyName + (hasInversOf ? " is invers of " + inversProperties.stream()
+                                .map(prp -> prp.toString())
+                                .collect(Collectors.joining()) : " no invers"));
+
+                        ObjectPropertyModel objectPropertyModel = new ObjectPropertyModel(objectClassModel, propertyName, propertyType, !isFunctional, objectProperty.getIRI());
+                        objectPropertyModels.put(objectProperty, objectPropertyModel);
+                    });
+        }
+
+
+        // Handle inverse properties
+        for (OWLInverseObjectPropertiesAxiom inverseProperty : ontology.getAxioms(AxiomType.INVERSE_OBJECT_PROPERTIES)) {
+            if (objectPropertyModels.containsKey(inverseProperty.getFirstProperty()) &&
+                    objectPropertyModels.containsKey(inverseProperty.getSecondProperty())) {
+                // Set the inverse relationship
+                objectPropertyModels.get(inverseProperty.getFirstProperty()).setInverseOf(objectPropertyModels.get(inverseProperty.getSecondProperty()));
+            } else {
+                System.out.println("Skipping inverse property: " + inverseProperty.getFirstProperty() + " and " + inverseProperty.getSecondProperty() +
+                        " because one of them is not defined in the ontology.");
             }
         }
+
+        for (OWLObjectProperty objectProperty : ontology.getObjectPropertiesInSignature()) {
+            if (!objectPropertyModels.containsKey(objectProperty)) {
+                System.out.println("Skipping objectProperty " + objectProperty);
+                continue; // Skip if domain is not a class
+            }
+            for (OWLClassExpression domain : EntitySearcher.getDomains(objectProperty, ontology).collect(Collectors.toList())) {
+                if (!domain.isOWLClass()) {
+                    System.out.println("Skipping domain: " + domain + " for object property: " + objectProperty.getIRI().getShortForm());
+                    continue; // Skip if domain is not a class
+                }
+                OWLClass cls = domain.asOWLClass();
+                ClassModel classModel = classModels.get(cls);
+
+                classModel.addObjectProperty(objectPropertyModels.get(objectProperty));
+            }
+        }
+
 
         for (OWLClass parentClass : ontology.getClassesInSignature()) {
             for (OWLSubClassOfAxiom axiom : ontology.getSubClassAxiomsForSubClass(parentClass)) {

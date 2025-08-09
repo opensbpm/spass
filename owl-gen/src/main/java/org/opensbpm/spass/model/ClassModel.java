@@ -61,6 +61,7 @@ public class ClassModel {
     }
 
     public void addObjectProperty(ObjectPropertyModel propertyModel) {
+        propertyModel.setSubjectModel(this);
         objectProperties.add(propertyModel);
     }
 

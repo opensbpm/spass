@@ -16,6 +16,7 @@ public class JavaProperty {
     private String typeName;
     private boolean multiValue;
     private String iri;
+    private JavaProperty inverseOf;
 
     public JavaProperty(String name, String typeName) {
         this.name = name;
@@ -54,4 +55,15 @@ public class JavaProperty {
         return iri;
     }
 
+    public boolean hasInverseOf() {
+        return inverseOf != null;
+    }
+
+    public JavaProperty getInverseOf() {
+        return inverseOf;
+    }
+
+    public void setInverseOf(JavaProperty inverseOf) {
+        this.inverseOf = inverseOf;
+    }
 }

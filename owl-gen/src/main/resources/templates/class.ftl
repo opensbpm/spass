@@ -30,6 +30,13 @@ public class ${className}
 
     public void set${prop.name?cap_first}(${prop.type} ${prop.name}){
         this.${prop.name} = ${prop.name};
+    <#if prop.hasInverseOf() >
+        <#if prop.inverseOf.multiValue>
+        ${prop.name}.forEach(v->((Mutable${prop.typeName})v).add${prop.inverseOf.name?cap_first}(this));
+        <#else>
+        ${prop.name}.set${prop.inverseOf.name?cap_first}(this);
+        </#if>
+    </#if>
     }
 
     <#if prop.multiValue>
@@ -38,6 +45,13 @@ public class ${className}
             this.${prop.name} = new java.util.ArrayList<>();
         }
         this.${prop.name}.add(value);
+    <#if prop.hasInverseOf() >
+        <#if prop.inverseOf.multiValue>
+        ${prop.name}.forEach(v->((Mutable${prop.typeName})v).add${prop.inverseOf.name?cap_first}(this));
+        <#else>
+        ${prop.name}.set${prop.inverseOf.name?cap_first}(this);
+        </#if>
+    </#if>
     }
     </#if>
 </#list>

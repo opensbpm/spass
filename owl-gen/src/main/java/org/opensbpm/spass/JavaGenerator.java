@@ -8,6 +8,7 @@ import org.opensbpm.spass.java.JavaClass;
 import org.opensbpm.spass.java.ModelFactory;
 import org.opensbpm.spass.java.JavaProperty;
 import org.opensbpm.spass.model.ClassModel;
+import org.opensbpm.spass.model.ObjectPropertyModel;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -59,7 +60,15 @@ class JavaGenerator {
             implJavaClass.addImplementsType(classModel.getClassName() + ".Mutable");
             implJavaClass.setApiPackageName(apiPackageName);
             classModel.streamProperties()
-                    .map(JavaProperty::of)
+                    .map(model -> {
+                        JavaProperty javaProperty = JavaProperty.of(model);
+                        if(model instanceof ObjectPropertyModel objectPropertyModel){
+                            if(objectPropertyModel.hasInverseOf())
+                                javaProperty.setInverseOf(JavaProperty.of(objectPropertyModel.getInverseOf()));
+
+                        }
+                        return javaProperty;
+                    })
                     .forEach(implJavaClass::addProperty);
             writeFile(implJavaClass, "class.ftl");
         }
