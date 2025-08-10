@@ -23,6 +23,8 @@ public interface ${className}
     </#if>
 </#list>
 
+    void accept(Visitor visitor);
+
     public interface Mutable extends ${className}
 <#list extendsTypes>
     , <#items as type>${type}.Mutable<#sep>, </#sep></#items>

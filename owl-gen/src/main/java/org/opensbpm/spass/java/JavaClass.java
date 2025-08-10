@@ -28,6 +28,7 @@ public class JavaClass {
     private String comment;
     private String apiPackageName;
     private String implPackageName;
+    private String name;
     private String className;
     private List<String> extendsTypes = new ArrayList<>();
     private List<String> implementsTypes = new ArrayList<>();
@@ -39,6 +40,11 @@ public class JavaClass {
 
     public JavaClass(String packageName, String className) {
         this.packageName = packageName;
+        this.className = className;
+    }
+    public JavaClass(String packageName, String name, String className) {
+        this.packageName = packageName;
+        this.name = name;
         this.className = className;
     }
 
@@ -68,6 +74,10 @@ public class JavaClass {
 
     public void setImplPackageName(String implPackageName) {
         this.implPackageName = implPackageName;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getClassName() {

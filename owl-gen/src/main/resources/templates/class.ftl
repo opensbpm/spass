@@ -74,6 +74,17 @@ public class ${className}
 </#list>
 
     @Override
+    public void accept(Visitor visitor){
+        visitor.visit${name?cap_first}(this);
+        super.accept(visitor);
+        <#list properties as prop>
+            <#if prop.multiValue && !prop.hasInverseOf()>
+        ${prop.name}.forEach(element -> element.accept(visitor));
+            </#if>
+        </#list>
+    }
+
+    @Override
     public String toString() {
         return "${className}{" +
             "iri=" + getIri() +

@@ -46,7 +46,7 @@ class JavaGenerator {
         for (ClassModel classModel : classModels) {
             writeFile(JavaClass.of(classModel, apiPackageName), "api.ftl");
 
-            JavaClass implJavaClass = new JavaClass(implPackageName, format("Mutable%s", classModel.getClassName()));
+            JavaClass implJavaClass = new JavaClass(implPackageName, classModel.getClassName(), format("Mutable%s", classModel.getClassName()));
             implJavaClass.setComment(classModel.getComment());
 
             if (!classModel.getSuperTypes().isEmpty()) {
@@ -83,18 +83,19 @@ class JavaGenerator {
         modelFactory.setImplPackageName(implPackageName);
         modelFactory.setApiPackageName(apiPackageName);
 
-        JavaClass visitorModel = new JavaClass(packageName, "Visitor");
+        JavaClass visitorModel = new JavaClass(apiPackageName, "Visitor");
         visitorModel.setImplPackageName(implPackageName);
         visitorModel.setApiPackageName(apiPackageName);
         for (ClassModel classModel : classModels) {
+            String iriString = classModel.getIri().getIRIString();
+            visitorModel.addProperty(new JavaProperty(classModel.getClassName(), classModel.getClassName(), iriString));
+
             if (asList("SimplePASSElement", "AdditionalAttribute", "KeyValuePair").contains(classModel.getIri().getShortForm())) {
                 continue;
             }
-            String iriString = classModel.getIri().getIRIString();
             objectFactoryModel.addProperty(new JavaProperty(classModel.getClassName(), classModel.getClassName(), iriString));
             defaultObjectFactoryModel.addProperty(new JavaProperty(classModel.getClassName(), classModel.getClassName()));
             modelFactory.addClassProperty(new JavaProperty(classModel.getClassName(), classModel.getClassName(), iriString));
-            visitorModel.addProperty(new JavaProperty(classModel.getClassName(), classModel.getClassName(), iriString));
         }
         writeFile(objectFactoryModel, "objectfactory.ftl");
         writeFile(defaultObjectFactoryModel, "defaultobjectfactory.ftl");
@@ -110,7 +111,9 @@ class JavaGenerator {
                 .forEach(modelFactory::addObjectProperty);
 
         writeFile(modelFactory, "modelfactory.java.ftl");
-        writeFile(new JavaClass(implPackageName, "AbstractElement"), "abstractelement.ftl");
+        JavaClass abstractElement = new JavaClass(implPackageName, "AbstractElement");
+        abstractElement.setApiPackageName(apiPackageName);
+        writeFile(abstractElement, "abstractelement.ftl");
 
     }
 

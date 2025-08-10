@@ -31,7 +31,7 @@
     		<rdf:type rdf:resource="&standard-pass-ont;StartSubject" ></rdf:type>
     		<standard-pass-ont:hasModelComponentID rdf:datatype="&xsd;string" >ASubjectBehavior</standard-pass-ont:hasModelComponentID>
     		<standard-pass-ont:hasModelComponentLabel xml:lang="en" >A SubjectBehavior</standard-pass-ont:hasModelComponentLabel>
-    		<standard-pass-ont:containsBehavior rdf:resource="http://opensbpm.org/pass/minimal#ASubjectBehavior" />
+    		<standard-pass-ont:belongsTo rdf:resource="http://opensbpm.org/pass/minimal#ASubjectBehavior" />
     </owl:NamedIndividual>
 
     <owl:NamedIndividual rdf:about="http://opensbpm.org/pass/minimal#ASubjectBehavior" >

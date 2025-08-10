@@ -13,5 +13,5 @@ To get started with the project, follow these steps:
 
 Shrotcut for the above two commands:
 ```bash
-  mvn -pl owl-gen install; mvn -pl reader clean install
+  mvn -pl owl-gen install && mvn -pl reader clean install
 ```

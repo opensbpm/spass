@@ -1,6 +1,5 @@
 package org.opensbpm.spass.reader;
 
-import org.opensbpm.spass.reader.model.Visitor;
 import org.opensbpm.spass.reader.model.api.*;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
@@ -16,7 +15,7 @@ public class Main {
         System.out.println("Loaded PASS Process Model: " + passProcessModel.getHasModelComponentID());
         StringBuilder pumlDiag = new StringBuilder();
         pumlDiag.append("@startuml\n");
-        new VisitContext(new Visitor() {
+        passProcessModel.accept(new Visitor() {
             @Override
             public void visitPASSProcessModelElement(PASSProcessModelElement element) {
                 System.out.println("Element ID: " + element.getHasModelComponentID() + ", Label: " + element.getHasModelComponentLabel());
@@ -67,7 +66,7 @@ public class Main {
                     }
                 }
             }
-        }).visitPASSProcessModel(passProcessModel);
+        });
         pumlDiag.append("@enduml\n");
         Path path = Path.of("pumlDiag.puml");
         Files.writeString(path, pumlDiag.toString());
