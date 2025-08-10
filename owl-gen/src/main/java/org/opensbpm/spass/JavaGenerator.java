@@ -82,6 +82,10 @@ class JavaGenerator {
         ModelFactory modelFactory = new ModelFactory(apiPackageName, "ModelFactory");
         modelFactory.setImplPackageName(implPackageName);
         modelFactory.setApiPackageName(apiPackageName);
+
+        JavaClass visitorModel = new JavaClass(packageName, "Visitor");
+        visitorModel.setImplPackageName(implPackageName);
+        visitorModel.setApiPackageName(apiPackageName);
         for (ClassModel classModel : classModels) {
             if (asList("SimplePASSElement", "AdditionalAttribute", "KeyValuePair").contains(classModel.getIri().getShortForm())) {
                 continue;
@@ -90,9 +94,11 @@ class JavaGenerator {
             objectFactoryModel.addProperty(new JavaProperty(classModel.getClassName(), classModel.getClassName(), iriString));
             defaultObjectFactoryModel.addProperty(new JavaProperty(classModel.getClassName(), classModel.getClassName()));
             modelFactory.addClassProperty(new JavaProperty(classModel.getClassName(), classModel.getClassName(), iriString));
+            visitorModel.addProperty(new JavaProperty(classModel.getClassName(), classModel.getClassName(), iriString));
         }
         writeFile(objectFactoryModel, "objectfactory.ftl");
         writeFile(defaultObjectFactoryModel, "defaultobjectfactory.ftl");
+        writeFile(visitorModel, "visitor.java.ftl");
 
         classModels.stream()
                 .flatMap(classModel -> classModel.getDataProperties().stream())

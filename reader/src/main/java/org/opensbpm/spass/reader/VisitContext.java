@@ -13,7 +13,7 @@ class VisitContext {
         if (element instanceof State) {
             visitState((State) element);
         } else {
-            visitor.visit(element);
+            visitor.visitPASSProcessModelElement(element);
         }
         if (element.getContains() != null) {
             element.getContains().forEach(this::visit);

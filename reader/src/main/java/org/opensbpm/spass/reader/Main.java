@@ -17,7 +17,7 @@ public class Main {
         pumlDiag.append("@startuml\n");
         new VisitContext(new Visitor() {
             @Override
-            public void visit(PASSProcessModelElement element) {
+            public void visitPASSProcessModelElement(PASSProcessModelElement element) {
                 System.out.println("Element ID: " + element.getHasModelComponentID() + ", Label: " + element.getHasModelComponentLabel());
             }
 
