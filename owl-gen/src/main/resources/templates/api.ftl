@@ -1,7 +1,7 @@
 package ${packageName};
 
 import org.semanticweb.owlapi.model.IRI;
-import java.util.List;
+import java.util.Collection;
 
 <#if comment?has_content>
 /**
@@ -16,7 +16,11 @@ public interface ${className}
     IRI getIri();
 
 <#list properties as prop>
+    <#if prop.multiValue>
+    Collection<${prop.type}> get${prop.name?cap_first}();
+    <#else>
     ${prop.type} get${prop.name?cap_first}();
+    </#if>
 </#list>
 
     public interface Mutable extends ${className}
@@ -25,8 +29,11 @@ public interface ${className}
 </#list>
     {
     <#list properties as prop>
-
+        <#if prop.multiValue>
+        void set${prop.name?cap_first}(Collection<${prop.type}> value);
+        <#else>
         void set${prop.name?cap_first}(${prop.type} value);
+        </#if>
 
         <#if prop.multiValue>
         void add${prop.name?cap_first}(${prop.typeName} value);

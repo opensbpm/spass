@@ -42,9 +42,8 @@ public class JavaProperty {
     public String getTypeName() {
         return typeName;
     }
-
     public String getType() {
-        return isMultiValue() ? format("List<%s>", typeName) : typeName;
+        return typeName;
     }
 
     public boolean isMultiValue() {

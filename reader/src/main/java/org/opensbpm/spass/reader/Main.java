@@ -1,5 +1,6 @@
 package org.opensbpm.spass.reader;
 
+import org.opensbpm.spass.reader.model.Visitor;
 import org.opensbpm.spass.reader.model.api.*;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 

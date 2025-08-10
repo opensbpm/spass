@@ -1,6 +1,6 @@
 package ${packageName};
 
-import ${apiPackageName}.PASSProcessModelElement.Mutable;
+import ${apiPackageName}.*;
 
 public interface ${className} {
 

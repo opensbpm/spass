@@ -1,5 +1,6 @@
 package org.opensbpm.spass.reader;
 
+import org.opensbpm.spass.reader.model.Visitor;
 import org.opensbpm.spass.reader.model.api.*;
 
 class VisitContext {
@@ -22,24 +23,18 @@ class VisitContext {
 
     public void visitPASSProcessModel(PASSProcessModel element) {
         visitor.visitPASSProcessModel(element);
-        if (element.getHasStartSubject() != null) {
-            element.getHasStartSubject().forEach(this::visitStartSubject);
-        }
+        element.getHasStartSubject().forEach(this::visitStartSubject);
     }
 
     private void visitStartSubject(StartSubject element) {
         visitor.visitStartSubject(element);
-        if (element.getContainsBehavior() != null) {
-            element.getContainsBehavior().forEach(this::visitSubjectBehavior);
-        }
+        element.getContainsBehavior().forEach(this::visitSubjectBehavior);
 
     }
 
     private void visitSubjectBehavior(SubjectBehavior element) {
         visitor.visitSubjectBehavior(element);
-        if (element.getContains() != null) {
-            element.getContains().forEach(this::visit);
-        }
+        element.getContains().forEach(this::visit);
     }
 
     private void visitState(State element) {
@@ -50,13 +45,8 @@ class VisitContext {
         } else {
             throw new UnsupportedOperationException("Unsupported state type: " + element.getClass().getName());
         }
-        if (element.getHasFunctionSpecification() != null) {
-            element.getHasFunctionSpecification().forEach(this::visitFunctionSpecification);
-        }
-
-        if (element.getHasOutgoingTransition() != null) {
-            element.getHasOutgoingTransition().forEach(this::visitTransition);
-        }
+        element.getHasFunctionSpecification().forEach(this::visitFunctionSpecification);
+        element.getHasOutgoingTransition().forEach(this::visitTransition);
     }
 
     private void visitDoState(DoState element) {
